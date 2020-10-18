@@ -1,6 +1,5 @@
 package com.example.vns_handheld004;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;

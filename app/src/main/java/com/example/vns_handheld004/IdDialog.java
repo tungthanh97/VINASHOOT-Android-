@@ -1,4 +1,4 @@
-package com.example.vns_handheld004.View;
+package com.example.vns_handheld004;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,12 +29,18 @@ public class IdDialog extends AppCompatDialogFragment {
     private EditText etid;
     private TextView tvWarning;
     SharedPreferences sharedPreferences;
+    private  IdDialogListener listener;
     SharedPreferences.Editor editor;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context=context;
-//        initPreferences();
+        initPreferences();
+        try{
+            listener = (IdDialog.IdDialogListener) context;
+        } catch(ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement TargetDialogListener");
+        }
     }
     @NonNull
     @Override
@@ -55,10 +61,12 @@ public class IdDialog extends AppCompatDialogFragment {
                         String ID = etid.getText().toString();
                         if (ID.length()<5) {
                             tvWarning.setText("ID must have 5 letters");
-                            return;
                         }
-//                        editor.putString("ID", ID);
-//                        editor.commit();
+                        else {
+                            editor.putString("ID", ID);
+                            editor.commit();
+                            listener.applyID();
+                        }
                     }
                 });
         initView();
@@ -69,14 +77,20 @@ public class IdDialog extends AppCompatDialogFragment {
         tvWarning = view.findViewById(R.id.tvWarning);
         etid = (EditText) view.findViewById(R.id.etID);
         etid.requestFocus();
+        String savedData = sharedPreferences.getString("ID", "YA001");
+        etid.setText(savedData);
+//        getDialog().getWindow().setSoftInputMode(
+//                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
-    //init shared prefrerences
-//    private void initPreferences() {
+//    init shared prefrerences
+    private void initPreferences() {
 //        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        editor = sharedPreferences.edit();
-//        String savedData = sharedPreferences.getString("ID", "YA001");
-//        etid.setText(savedData);
-//    }
+        sharedPreferences = getActivity().getSharedPreferences("IDs",0);
+        editor = sharedPreferences.edit();
+    }
+    public interface IdDialogListener {
+        void applyID();
+    }
 }

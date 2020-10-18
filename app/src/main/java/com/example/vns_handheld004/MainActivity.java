@@ -26,6 +26,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,7 +39,6 @@ import com.example.vns_handheld004.Broadcast.MyBroadcastListener;
 import com.example.vns_handheld004.Model.Shoot_result;
 import com.example.vns_handheld004.Services.USBConnectionServices;
 import com.example.vns_handheld004.Util.FixedGridLayoutManager;
-import com.example.vns_handheld004.View.IdDialog;
 import com.example.vns_handheld004.View.PixelGridView;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener,TargetDialog.TargetDialogListener,ShootAdapter.OnTableViewListener,TargetAdapter.OnTargetClickListener {
+public class MainActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener,TargetDialog.TargetDialogListener,ShootAdapter.OnTableViewListener,TargetAdapter.OnTargetClickListener, IdDialog.IdDialogListener {
     // Declare
     ArduinoMessageReceiver arduinoMessageReceiver;
     private static final String STATE = "Main Activity";
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private static CountDownTimer timer;
     private Target_Frame target_frame = new Target_Frame(this);
     private TargetAdapter targetAdapter ;
+    private AlertDialog dialog;
     int scrollX = 0;
     private List<Bitmap> bitmapArrayList = new ArrayList<>();
     SharedPreferences sharedPreferences;
@@ -129,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         Log.e(STATE, "onDestroy");
         unregisterReceiver(arduinoMessageReceiver);
     }
-    //Data row click listener
+    //
+
     //<--Initialize View-->
     protected void initView() {
         btnSetting = findViewById(R.id.btnSetting);
@@ -152,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     }
 
     private void initPreferences() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = getSharedPreferences("IDs",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         String savedData = sharedPreferences.getString("ID", "YA001");
         tvid.setText(savedData);
@@ -435,5 +438,11 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         mImageBorder.openImageBitmap(bitmapArrayList.get(position),Target_select);
         rvShootresult.setAdapter(shootAdapter);
         tvFrameNo.setText("Frame name: "+FrameName);
+    }
+
+    @Override
+    public void applyID() {
+        String savedData = sharedPreferences.getString("ID", "YA001");
+        tvid.setText(savedData);
     }
 }
