@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">VNS-Handheld 0.0.4</string>
+    <string name="setting">Setting Connection</string>
+    <string name="usb">USB CONNECTION</string>
+    <string name="settingbtn">Settings</string>
+    <string name="target">Target Frame</string>
+    <string name="daibanso">Land Number</string>
+    <string name="Temp">Temp</string>
+    <string name="time">Time</string>
+    <string name="image_border">image border</string>
+    <string name="gridsize">Grid size :</string>
+    <string name="_5cm">5cm</string>
+    <string name="_10cm">10cm</string>
+    <string name="_20cm">20cm</string>
+    <string name="_30cm">30cm</string>
+    <string name="_40cm">40cm</string>
+    <string name="zigbee">ZIG CONNECTION</string>
+    <string name="lan">LAN CONNECTION</string>
+    <string name="rs485">RS485 CONNECTION</string>
+    <string name="check">CHECK</string>
+    <string name="_0cm">0cm</string>
+    <string name="No">No</string>
+    <string name="X">X(mm)</string>
+    <string name="Y">Y(mm)</string>
+    <string name="V">V(m/s)</string>
+    <string name="Mark">Mark</string>
+    <string name="M_H">M/H</string>
+    <string name="Time">Time</string>
+    <string name="IDconfig">Config user ID:</string>
+</resources>

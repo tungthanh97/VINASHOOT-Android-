@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/row_height">
+
+    <TextView
+        android:id="@+id/txtNo"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        android:layout_weight="9"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/No"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_axisX"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/X"
+        android:layout_weight="12"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_axisY"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/Y"
+        android:layout_weight="12"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_V"
+        android:layout_width="55dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/V"
+        android:layout_weight="11"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_Mark"
+        android:layout_width="55dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/Mark"
+        android:layout_weight="9"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_M_H"
+        android:layout_width="53dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/M_H"
+        android:textAllCaps="true"
+        android:layout_weight="8"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_Time"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_selector_odd"
+        android:gravity="center"
+        android:text="@string/Time"
+        android:layout_weight="12"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+</LinearLayout>

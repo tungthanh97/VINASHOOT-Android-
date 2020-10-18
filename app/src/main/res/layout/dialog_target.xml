@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contain_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintStart_toEndOf="@id/tvGridsize">
+
+        <Button
+            android:id="@+id/btn0"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/button"
+            android:gravity="center"
+            android:text="@string/_0cm"
+            android:textColor="@color/Black" />
+        <Button
+            android:id="@+id/btn1"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_weight="2"
+            android:background="@drawable/button"
+            android:gravity="center"
+            android:text="@string/_5cm"
+            android:textColor="@color/Black" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvGridsize"
+        android:layout_width="130dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/gridsize"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UnknownId" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@+id/tvGridsize"
+        app:layout_constraintTop_toBottomOf="@id/tvGridsize">
+
+        <Button
+            android:id="@+id/btn2"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button"
+            android:gravity="center"
+            android:text="@string/_10cm"
+            android:textColor="@color/Black" />
+
+        <Button
+            android:id="@+id/btn3"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="0dp"
+            android:layout_weight="2"
+            android:background="@drawable/button"
+            android:checked="true"
+            android:gravity="center"
+            android:text="@string/_20cm"
+            android:textColor="@color/Black"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/btn4"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_weight="3"
+            android:background="@drawable/button"
+            android:gravity="center"
+            android:text="@string/_30cm"
+            android:textColor="@color/Black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.607"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/btn5"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:layout_weight="4"
+            android:background="@drawable/button"
+            android:gravity="center"
+            android:text="@string/_40cm"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.351"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

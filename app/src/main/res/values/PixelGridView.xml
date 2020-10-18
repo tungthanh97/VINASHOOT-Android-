@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PixelGridView">
+        <attr name="row" format="integer"  />
+        <attr name="column" format="integer" />
+        <!--Central circle color -->
+        <attr name="spread_center_color" format="color" />
+        <!-- radius of the center circle -->
+        <attr name="spread_radius" format="integer" />
+        <!-- Diffusion circle color -->
+        <attr name="spread_spread_color" format="color" />
+        <!-- Diffusion spacing -->
+        <attr name="spread_distance" format="integer" />
+        <!-- Maximum radius of diffusion -->
+        <attr name="spread_max_radius" format="integer" />
+        <!-- Diffusion delay interval -->
+        <attr name="spread_delay_milliseconds" format="integer" />
+    </declare-styleable>
+</resources>

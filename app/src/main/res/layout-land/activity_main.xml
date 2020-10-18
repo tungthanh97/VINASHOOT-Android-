@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/Company_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context="com.example.vns_handheld004.MainActivity">
+        <!--  Layout LOGO  -->
+        <LinearLayout
+            android:id="@+id/layoutlogo"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/layoutImageTarget">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/border"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/vinashoot_logo" />
+
+            <TextView
+                android:id="@+id/app_id"
+                android:layout_width="652dp"
+                android:layout_height="match_parent"
+                android:layout_weight="23"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text='VINASHOOT HANDHELD ID:'
+                android:textColor="#0E0000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!--Layout Target Image= layout Target setting + Image Target + rv Target-->
+
+        <LinearLayout
+            android:id="@+id/layoutImageTarget"
+            android:layout_width="400dp"
+            android:layout_height="284dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/layoutTable"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/layoutTable"
+            app:layout_constraintVertical_bias="0.0">
+
+            <LinearLayout
+                android:id="@+id/layoutTargetSetting"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnSetting"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/setting"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/setting_icon" />
+
+                <TextView
+                    android:id="@+id/tvTargetName"
+                    android:layout_width="145dp"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="@string/target"
+                    android:textColor="#100101"
+                    android:textSize="20sp" />
+
+                <ImageButton
+                    android:id="@+id/btnGridsize"
+                    android:layout_width="28dp"
+                    android:layout_height="35dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/gridsize"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/grid_icon" />
+            </LinearLayout>
+
+            <com.example.vns_handheld004.View.PixelGridView
+                android:id="@+id/PgvTarget"
+                android:layout_width="397dp"
+                android:layout_height="245dp"
+                android:background="@drawable/border"
+                android:contentDescription="@string/image_border"
+                app:spread_center_color="@color/Red"
+                app:spread_delay_milliseconds="300"
+                app:spread_distance="1"
+                app:spread_spread_color="@color/Red" />
+
+        </LinearLayout>
+
+<!--    Layout Table: layout Details + table headerScroll + rvShootResult-->
+
+        <LinearLayout
+            android:id="@+id/layoutTable"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/layoutImageTarget"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/layoutImageTarget"
+            app:layout_constraintTop_toBottomOf="@id/layoutlogo"
+            app:layout_constraintVertical_bias="0.0">
+
+            <!--  Layout Details  -->
+
+            <LinearLayout
+                android:id="@+id/layoutDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layoutDetails1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/Daibanso"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/daibanso"
+                        android:textColor="#100101"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/Time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/time"
+                        android:textColor="#100101"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/Temp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/Temp"
+                        android:textColor="#100101"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutDetails2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/value_daiban"
+                        android:layout_width="72dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textColor="#100101"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/value_time"
+                        android:layout_width="97dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="90"
+                        android:textColor="#100101"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/value_temp"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="35.6"
+                        android:textColor="#100101"
+                        android:textSize="24sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+            <!--    Header View Table    -->
+            <HorizontalScrollView
+                android:id="@+id/headerScroll"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/border"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtNo"
+                        android:layout_width="36dp"
+                        android:layout_height="35dp"
+                        android:layout_weight="9"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/No"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_axisX"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/X"
+                        android:layout_weight="12"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_axisY"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/Y"
+                        android:layout_weight="12"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_V"
+                        android:layout_width="55dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/V"
+                        android:layout_weight="11"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_Mark"
+                        android:layout_width="55dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/Mark"
+                        android:layout_weight="9"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_M_H"
+                        android:layout_width="53dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_unselected_odd"
+                        android:gravity="center"
+                        android:text="@string/M_H"
+                        android:textAllCaps="true"
+                        android:layout_weight="8"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_Time"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/row_selector_odd"
+                        android:gravity="center"
+                        android:text="@string/Time"
+                        android:layout_weight="12"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvShootresults"
+                android:layout_width="match_parent"
+                android:layout_height="145dp"></androidx.recyclerview.widget.RecyclerView>
+
+            <LinearLayout
+                android:id="@+id/layoutTarget"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTarget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                </androidx.recyclerview.widget.RecyclerView>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
