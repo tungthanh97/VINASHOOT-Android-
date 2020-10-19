@@ -31,13 +31,13 @@
 
         <EditText
             android:id="@+id/etID"
-            android:layout_width="80dp"
+            android:layout_width="match_parent"
             android:layout_height="46dp"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical|start"
             android:background="@drawable/border"
             android:text="YA001"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:maxLength="5"
             android:inputType="textCapCharacters">
 

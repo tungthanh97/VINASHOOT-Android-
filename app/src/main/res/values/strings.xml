@@ -4,7 +4,7 @@
     <string name="usb">USB CONNECTION</string>
     <string name="settingbtn">Settings</string>
     <string name="target">Target Frame</string>
-    <string name="daibanso">Land Number</string>
+    <string name="LaneNumber">Lane Number</string>
     <string name="Temp">Temp</string>
     <string name="time">Time</string>
     <string name="image_border">image border</string>
@@ -27,4 +27,5 @@
     <string name="M_H">M/H</string>
     <string name="Time">Time</string>
     <string name="IDconfig">Config user ID:</string>
+    <string name="vinashoot">VINASHOOT</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.example.vns_handheld004;
 
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -19,6 +21,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 
 import android.widget.ImageButton;
@@ -47,12 +51,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener,TargetDialog.TargetDialogListener,ShootAdapter.OnTableViewListener,TargetAdapter.OnTargetClickListener, IdDialog.IdDialogListener {
+public class MainActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener,TargetDialog.TargetDialogListener,ShootAdapter.OnTableViewListener,TargetAdapter.OnTargetClickListener {
     // Declare
     ArduinoMessageReceiver arduinoMessageReceiver;
     private static final String STATE = "Main Activity";
     private boolean idUSBConnectionService = false, isRestart = false;
-    Intent intent;
+    private Intent intent;
+    private String ID;
     private USBConnectionServices usbConnectionServices;
     private ImageButton btnSetting, btnGridsize;
     private PixelGridView mImageBorder;
@@ -82,9 +87,10 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.e(STATE, "onCreate");
+        initView();
+        initPreferences();
         intent = new Intent(MainActivity.this, USBConnectionServices.class);
         startService(intent);
-        initView();
         initArduinoMessagereceiver();
     }
     @Override
@@ -150,17 +156,16 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         initTargetList();
         setOnListener();
         initTable();
-        initPreferences();
     }
 
     private void initPreferences() {
-//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences = getSharedPreferences("IDs",MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        String savedData = sharedPreferences.getString("ID", "YA001");
-        tvid.setText(savedData);
+        ID = sharedPreferences.getString("ID", "YA001"); // Load ID from Preference
+        tvid.setText(ID);
     }
-    //Init Target List Recycle VIew
+    //<--------------------------------init Activity Listener--------------------->
+    //Init Recycle VIew to show TARGET LIST
     private void initTargetList() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         rvTarget = findViewById(R.id.rvTarget);
@@ -168,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         targetAdapter = new TargetAdapter(MainActivity.this,bitmapArrayList,this);
         rvTarget.setAdapter(targetAdapter);
     }
+    //Init Listener
     protected void setOnListener(){
         btnSetting.setOnClickListener(this);
         btnGridsize.setOnClickListener(this);
@@ -213,12 +219,51 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             }
         });
     }
-    //Init Shooting result table Recycle View
+
+    //Init ID dialog to change ID
     private void openIDdialog(){
-        Log.e(STATE, "openIDDialog");
-        IdDialog IdDialog = new IdDialog();
-        IdDialog.show(getSupportFragmentManager(), "ID Dialog");
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_id,null);
+        final EditText etID = mView.findViewById(R.id.etID);
+        etID.requestFocus();
+        etID.setText(ID);
+        etID.setSelection(5);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        mBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        mBuilder.setView(mView);
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String new_ID = etID.getText().toString();
+                if (new_ID.length() < 5) {
+                    Toast.makeText(MainActivity.this, "ID must have 5 letters!", Toast.LENGTH_SHORT).show();
+                } else {
+                    ID = new_ID;
+                    editor.putString("ID", ID);
+                    editor.commit();
+                    tvid.setText(ID);
+                    usbConnectionServices.updateID(ID);
+                    Toast.makeText(MainActivity.this, "ID changed successfully!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            }
+        });
     }
+    //Init Shooting result table Recycle View
     protected void initTable() {
         FixedGridLayoutManager manager = new FixedGridLayoutManager();
         manager.setTotalColumnCount(1);
@@ -249,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         targetDialog.setArguments(bundle);
         targetDialog.show(getSupportFragmentManager(), "Target Dialog");
     }
-
+    //<-----------------------------------Init Connection------------------------------>
     //USB SERVICE CONNECTION
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -258,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             idUSBConnectionService = true;
             USBConnectionServices.CallService bider = (USBConnectionServices.CallService) iBinder;
             usbConnectionServices = bider.getService();
+            usbConnectionServices.updateID(ID);
             if (!isRestart)
                 openUSBconnection();
         }
@@ -367,6 +413,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         float temp = (float) T / 10;
         tvtemp.setText(Float.toString(temp));
         tvFrameNo.setText(Integer.toString(L));
+        this.ID=ID;
+        usbConnectionServices.updateID(ID);
         tvid.setText(ID);
     }
 
@@ -413,6 +461,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     public void onTargetClick(int pos) {
         update_selected_target(pos);
     }
+    // update Target list
     protected void update_selected_target(int position){ // update table and bitmap with clicked Target
         String FrameName;
         Target_select = position+1;
@@ -437,12 +486,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         }
         mImageBorder.openImageBitmap(bitmapArrayList.get(position),Target_select);
         rvShootresult.setAdapter(shootAdapter);
-        tvFrameNo.setText("Frame name: "+FrameName);
+        tvFrameNo.setText(FrameName);
     }
 
-    @Override
-    public void applyID() {
-        String savedData = sharedPreferences.getString("ID", "YA001");
-        tvid.setText(savedData);
-    }
 }

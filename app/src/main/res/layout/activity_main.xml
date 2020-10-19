@@ -31,17 +31,17 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/Daibanso"
+                    android:id="@+id/tvLaneNumber"
                     android:layout_width="44dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="40dp"
+                    android:layout_marginStart="35dp"
                     android:layout_weight="1"
-                    android:text="@string/daibanso"
+                    android:text="@string/LaneNumber"
                     android:textColor="#100101"
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/Time"
+                    android:id="@+id/tvTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/time"
@@ -51,7 +51,7 @@
                     android:layout_weight="1"/>
 
                 <TextView
-                    android:id="@+id/Temp"
+                    android:id="@+id/tvTemp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="40dp"
@@ -281,60 +281,59 @@
                     android:orientation="horizontal"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layoutlogo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:layout_marginStart="4dp"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toTopOf="@+id/layoutDetails"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/layoutDetails">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="45dp"
-                android:layout_height="41dp"
+                android:layout_width="@dimen/logo_height"
+                android:layout_height="@dimen/logo_height"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/border"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/vinashoot_logo" />
+                android:src="@drawable/logo" />
 
-            <LinearLayout
-                android:id="@+id/layoutLogoName"
-                android:layout_width="335dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="8"
+            <ImageView
+                android:id="@+id/logoName"
+                android:layout_width="240dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="9"
+                android:paddingStart="25dp"
+                android:paddingEnd = "8dp"
                 android:background="@drawable/border"
-                android:gravity="center"
-                android:padding="8dp">
+                android:contentDescription="@string/app_name"
+                android:padding="0dp"
+                android:src="@drawable/logo_name" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text='VINASHOOT HANDHELD ID:'
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+            <Button
+                android:id="@+id/app_id"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="65dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_weight="1"
+                android:background="@drawable/id_selector"
+                android:text="YA001"
+                android:textColor="@color/Black"
+                android:textSize="17dp" />
 
-                <Button
-                    android:id="@+id/app_id"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/id_selector"
-                    android:layout_gravity="center_vertical|start"
-                    android:textSize="17dp"
-                    android:text="YA001"
-                    android:textColor="@color/Black" />
-
-            </LinearLayout>
         </LinearLayout>
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline4"

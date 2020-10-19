@@ -43,8 +43,8 @@ import java.util.Arrays;
 
 public class USBConnectionServices extends Service implements UsbSerialInterface.UsbReadCallback {
     //Declaration
-    public static final String ID_Phone = "YSM00";//5 byte
-    public static final String ID_PC = "YS000";//5 byte
+    public  String ID_Phone = "YA001";//5 byte
+    public static final String ID_PC = "YA000";//5 byte
     public static final String SEND_START = "@@";
     public static final String RECEIVE_START = "&&";
     public static final String MSG_STOP = ">>";
@@ -61,7 +61,6 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
 
     public USBConnectionServices() {
     }
-
     @Override
     public void onCreate() {
         Log.e("Service", "onCreate");
@@ -73,43 +72,32 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(broadcastReceiver, filter);
     }
-
-    //
     @Override
     public IBinder onBind(Intent intent) {
         Log.e("Service", "onBind");
         return iBinder;
     }
-
-    //
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
-
-    //
     @Override
     public boolean onUnbind(Intent intent) {
         Log.e("Service", "onUnbind");
         return super.onUnbind(intent);
     }
-
-    //
     @Override
     public void onRebind(Intent intent) {
         Log.e("Service", "onRebind");
         super.onRebind(intent);
     }
-
-    // SERVICE CLOSE
     @Override
     public void onDestroy() {
         Log.e("Service", "onDestroy");
         unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
-
-    //
+    //<<-----------------------------USB connect Broadcast receiver----------------------->>
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() { //Broadcast Receiver to automatically start and stop the Serial connection.
         @Override
         public synchronized void onReceive(Context context, Intent intent) {
@@ -147,16 +135,12 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             }
         }
     };
-
-    //When Arduino connected
     private void ArduinoAttached() {
         Toast.makeText(USBConnectionServices.this, "ARDUINO ATTACHED", Toast.LENGTH_SHORT).show();
         Log.e("Arduino","Attached");
         openSerialport();
-    }
-
-    //send connected broadcast
-    private void connected_broadcast() {
+    }     //When Arduino attached
+    private void connected_broadcast() {            //send connected broadcast
         is_connected = true;
         Log.e("ARDUINO", "CONNECTED");
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -171,8 +155,6 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         intent.setAction("USBconnected");
         sendBroadcast(intent);
     }
-
-    //USB not connected
     public void notconnected_broadcast() {
         is_connected= false;
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -186,8 +168,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         Intent intent = new Intent();
         intent.setAction("USBdisconnected");
         sendBroadcast(intent);
-    }
-    //USB disconnected
+    }     //USB not connected
     public void disconnected_broadcast() {
         is_connected = false;
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -201,8 +182,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         Intent intent = new Intent();
         intent.setAction("USBdisconnected");
         sendBroadcast(intent);
-    }
-    //open USB connection
+    }     //USB disconnected
     public synchronized void openUSBconnection(){
         if (serialPort != null) { //if Serial port opened
 //            Log.e("ACTION", "CHECK CONNECT1");
@@ -210,8 +190,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         }
         else
             notconnected_broadcast();
-    }
-    //open Serial port
+    }    //open USB connection
     public synchronized void openSerialport() {
         HashMap<String, UsbDevice> usbDevices = usbManager.getDeviceList();
         if (!usbDevices.isEmpty()) {
@@ -236,36 +215,29 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         } else {
             notconnected_broadcast();
         }
-    }
-    // wait 100ms and check usb status
+    }    //open Serial port
     public void ArduinoDetached() {
         Log.e("Arduino", "Detached");
         disconnected_broadcast();
-    }
-
-    // close USB connection by button OFF
+    }    // wait 100ms and check usb status
     public void closeUSBconnection() {
         Log.e("Arduino", "close_port");
         disconnected_broadcast();
-    }
-
-    //check USB connection Status
+    }    // close USB connection by button OFF
     private boolean isUSBconnected(){
         if (serialPort == null) return false;
         return serialPort.isOpen();
-    }
+    }    //check USB connection Status
     public boolean getArduinoStatus(){
         return is_connected;
     }
-    //Interface to call Service from Service
     public class CallService extends Binder {
         public USBConnectionServices getService() {
             return USBConnectionServices.this;
         }
-    }
+    }    //Interface to call Service from Service
 
     //<----------------------------------FUNCTION------------------------------------>
-    // checksum
     private int generate_checksum(String S) {
         int i, x, checksum, sum = 0;
         for (i = 0; i < S.length(); i++) {
@@ -274,22 +246,19 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         }
         checksum = sum % 256;
         return checksum;
-    }
-    //character to Byte
+    }     // checksum
     byte toBytes(char ch) {
         byte toByte = (byte) (0xFF & (int) ch);
         return toByte;
-    }
-    //get byte String
+    }    //character to Byte
     int Sbyte_to_int(String data){
         int c1=data.charAt(0);
         int c2=data.charAt(1);
         int res1 = c1 & 0xFF;
         int res2 = c2 & 0xFF;;
         return res1*256 + res2 ;
-    }
+    }    //get byte String
     //<------------------------------------ SEND MESSAGE--------------------------------->
-    // send Message to Arduino
     public void sendMessagetoArduino(String Text) {
         int i, l = Text.length();
         byte[] toByte = new byte[1];
@@ -298,9 +267,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             toByte[0] = toBytes(Text.charAt(i));
             serialPort.write(toByte);
         }
-    }
-
-    // to check USB connection
+    }     // send Message to Arduino
     public void check_USB_connection() {
         if (isUSBconnected()) {
             String S = SEND_START + (char) 0 + ID_PC + ID_Phone  + (char) 1+ MSG_STOP;
@@ -308,15 +275,14 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             sendMessagetoArduino(Message);
         } else
             notconnected_broadcast();
-    }
-    //send data to PC
+    }    // to check USB connection
     public void send_data(int command_code, int data_length, String data) {
         if (is_connected) {
             String S = SEND_START + (char) data_length + ID_PC + ID_Phone  + (char) command_code +data + MSG_STOP;
             String Message = SEND_START + (char) data_length + ID_PC + ID_Phone + (char) command_code + data + (char) generate_checksum(S) + MSG_STOP;
             sendMessagetoArduino(Message);
         }
-    }
+    }    //send data to PC
 
     ///////////////////////////////////////////////////////////*************************************///////////////////////////////////////////////////////////////////////
     //<----------------------------------------RECEIVE MESSAGE------------------------------>
@@ -350,7 +316,6 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             message = null;
         }
     }
-    //convert text to hex
     public static String textToHex(String text) {
         byte[] buf = null;
         buf = text.getBytes(encodingType);
@@ -361,34 +326,26 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             chars[2 * i + 1] = HEX_CHARS[buf[i] & 0x0F];
         }
         return new String(chars);
-    }
+    }    //convert text to hex
     protected int data_length(String msg) {
         char ch = msg.charAt(2);
         return (int)ch;
     }
-
-    // return message data
     protected String Message_data(String msg) {
         int data_length = data_length(msg);
 
         String data = msg.substring(14, 14 + data_length); // message data
         return data;
-    }
-
-    //return message command
+    }    // return message data
     protected int Message_command(String msg) {
         char cmd = msg.charAt(13); // message data
         return (int) cmd;
-    }
-
-    //check received message length
+    }    //return message command
     protected boolean match_msg_length(String msg) {
         int real_msg_length = msg.length();
         int msg_length = 17 + data_length(msg);
         return (msg_length == real_msg_length);
-    }
-
-    //check received message checksum
+    }    //check received message length
     protected boolean match_checksum(String msg) {
         int data_length = data_length(msg);
         int check_sum = (int) msg.charAt(14 + data_length);
@@ -398,24 +355,20 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         else
             check_error = check_error - check_sum;
         return (check_sum == check_error);
-    }
-
-    //check received message id
+    }    //check received message checksum
     protected boolean match_id(String msg) {
         String ID_receive = msg.substring(3, 8);
         String ID_send = msg.substring(8, 13);
         return (ID_receive.equals(ID_Phone) && ID_send.equals(ID_PC));
-    }
-    // check message is valid or not
+    }    //check received message id
     protected boolean match_received_msg(String msg) {
         if ((Message_command(msg)!=1) && (!is_connected)) return false;
         if (!match_msg_length(msg)) return false;
-//        if (!match_checksum(msg)) return false;
+        if (!match_checksum(msg)) return false;
         if (!match_id(msg)) return false;
 
         return true;
-    }
-    //implement message command
+    }    // check message is valid or not
     protected void implement_msg_command(String msg) {
         int command_code = Message_command(msg);
         switch (command_code) {
@@ -442,20 +395,15 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
                 break;
         }
 
-    }
-
+    }    //implement message command
 
     //<----Handle received command---->
-    //receive USB connect msg -01
     protected void test_command(String msg) { //command code 01
         if (textToHex(Message_data(msg)).equals("01"))
             connected_broadcast();
         else
             notconnected_broadcast();
-    }
-
-
-    //load target frame image
+    }    //receive USB connect msg -01
     private void load_image(String msg) { //command code 02
         String data= Message_data(msg);
         if (data.length() != 5){
@@ -471,15 +419,12 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         intent.putExtra("target code",target_code);
         intent.putExtra("time",Countdown);
         sendBroadcast(intent);
-    }
-
-    //receive shooting result
+    }    //load target frame image
     private boolean is_result_valid(String data){
         if (data.length() != 8) return false;
         if (data.charAt(6)>60) return false;
         return data.charAt(7) <= 50;
-    }
-    // Receive shoot result
+    }    //receive shooting result
     private void shooting_result(String msg){ //command code 03
         String data= Message_data(msg);
         if (!is_result_valid(data)){
@@ -507,8 +452,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         result[6]=Time;
         intent.putExtra("Results",result);
         sendBroadcast(intent);
-    }
-
+    }    // Receive shoot result
     private void show_temper(String msg) { //command code 04
         String data= Message_data(msg);
         if (data.length() != 8){
@@ -525,8 +469,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         intent.putExtra("FrameNo",L);
         intent.putExtra("ID",ID);
         sendBroadcast(intent);
-    }
-
+    }   // Receive temperature, Frame Name and ID
     public void checkZIGconnection(){  //command code 07
         send_data(7,0,"");
     }
@@ -556,5 +499,8 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             intent.setAction("RS485connected");
             sendBroadcast(intent);
         }
+    }
+    public void updateID(String ID){
+        this.ID_Phone=ID;
     }
 }

@@ -3,4 +3,5 @@
     <dimen name="row_height">30dp</dimen>
     <dimen name="imgTargetW">45dp</dimen>
     <dimen name="imgTargetH">45dp</dimen>
+    <dimen name="logo_height">30dp</dimen>
 </resources>
