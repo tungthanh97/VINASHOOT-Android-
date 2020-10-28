@@ -69,7 +69,7 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
         int columns = a.getInt(R.styleable.PixelGridView_column, 0);
 //        newWidth = getScreenWidth((Activity)context);         // take screen size
         bitmap = Bitmap.createBitmap(newWidth,newHeight,Bitmap.Config.ARGB_8888);;
-        delayMilliseconds= a.getInt(R.styleable.PixelGridView_spread_delay_milliseconds, maxRadius);
+        delayMilliseconds= a.getInt(R.styleable.PixelGridView_spread_delay_milliseconds, delayMilliseconds);
         int centerColor = a.getColor(R.styleable.PixelGridView_spread_center_color, ContextCompat.getColor(context, R.color.Red));
         int spreadColor = a.getColor(R.styleable.PixelGridView_spread_spread_color, ContextCompat.getColor(context, R.color.Red));
         distance = a.getInt(R.styleable.PixelGridView_spread_distance, distance);
@@ -168,6 +168,7 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
         int y_center = (int)(ch + Image_h);
         int x_center = (int) newWidth /2 ;
         int new_numColumns = numColumns/2  ;
+
         for (int i = 0; i <= new_numColumns; i++) {
             alteredCanvas.drawLine(x_center + i * cellWidth, y_center, x_center + i * cellWidth, (int) ch, linePaint);
             alteredCanvas.drawLine(x_center - i * cellWidth, y_center, x_center - i * cellWidth, (int) ch, linePaint);
@@ -270,7 +271,8 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
             return displayMetrics.widthPixels;
         }
     }
-    private void drawfocus(Canvas canvas,int X,int Y,int size){
+    private void drawfocus(Canvas canvas,int X,int Y,int size)//draw focus point
+     {
         float ratio_w = Image_w/ target_width;
         float ratio_h = Image_h/ target_height;
         int targetX = (int)(ratio_w* (X + ((float)target_width)/2) + cw);
@@ -284,7 +286,8 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
             drawCircle(canvas,targetX,targetY);
         }
     }
-    private void drawCircle(Canvas canvas,int centerX,int centerY){
+    private void drawCircle(Canvas canvas,int centerX,int centerY)  //draw circle around focus point
+    {
         for (int i = 0; i < spreadRadius.size(); i++) {
             int alpha = alphas.get(i);
             spreadPaint.setAlpha(alpha);
@@ -292,18 +295,18 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
             // Drawing a diffused circle
             canvas.drawCircle(centerX, centerY, radius + width, spreadPaint);
             // Every time the radius of diffusion circle increases, the circular transparency decreases.
-            if (alpha > 0 && width < 20) {
+            if (alpha > 0 && width < maxRadius*3) {
                 alpha = alpha - distance-10 > 0 ? alpha - distance -10: 1;
                 alphas.set(i, alpha);
                 spreadRadius.set(i, width + distance);
             }
         }
         // When the radius of the outermost diffusion circle reaches the maximum radius, a new diffusion circle is added.
-        if (spreadRadius.get(spreadRadius.size() - 1) > maxRadius) {
+        if (spreadRadius.get(spreadRadius.size() - 1) > radius) {
             spreadRadius.add(0);
             alphas.add(255);
         }
-        // Over eight diffusion circles, delete the first drawn circle, that is, the outermost circle
+        // Over 5 diffusion circles, delete the first drawn circle, that is, the outermost circle
         if (spreadRadius.size() >= 5) {
             alphas.remove(0);
             spreadRadius.remove(0);
@@ -312,12 +315,6 @@ public class PixelGridView extends com.ortiz.touchview.TouchImageView {
         canvas.drawCircle(centerX, centerY, radius, centerPaint);
         // Delayed updating to achieve diffuse visual impairment
         final Handler handler = new Handler(Looper.getMainLooper());
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if(id == focusBullet) drawCircle(canvas, centerX, centerY, id);
-//            }
-//        }, delayMilliseconds);
         postInvalidateDelayed(delayMilliseconds);
     }
 }

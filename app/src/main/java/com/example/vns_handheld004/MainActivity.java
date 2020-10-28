@@ -11,6 +11,10 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -32,6 +36,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,6 +54,7 @@ import com.example.vns_handheld004.View.PixelGridView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,25 +70,26 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private ImageButton btnSetting, btnGridsize;
     private PixelGridView mImageBorder;
     private TextView tvtime, tvtemp, tvFrameNo, tvid, tvTargetName;
-    private int gridsize = 100, Target_count = 0, Target_select;
+    private int gridsize = 100, Target_count = 0, Target_select,Target_previous;
     private Bitmap bitmap;
     private static CountDownTimer timer;
     private Target_Frame target_frame = new Target_Frame(this);
     private TargetAdapter targetAdapter ;
     private AlertDialog dialog;
+    private LinearLayoutManager TargetlayoutManager;
+    private ConstraintLayout layoutMain;
     int scrollX = 0;
-    private List<Bitmap> bitmapArrayList = new ArrayList<>();
+    Paint borderPaint = new Paint();
+    private List<Bitmap> BitmapList_show = new ArrayList<>(),BitmapList_origin= new ArrayList<>();
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     List<Target_Frame> TargetList = new ArrayList<>();
     List<Shoot_result> shootList = new ArrayList<>();
     ArrayList<List<Shoot_result>> resultList= new ArrayList<>();
     RecyclerView rvShootresult,rvTarget;
-
+    NestedScrollView nsvTable;
     HorizontalScrollView headerScroll;
-
     ShootAdapter shootAdapter;
-
     @Override
     //<--Create status-->
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +116,10 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     protected void onResume() {
         super.onResume();
         Log.e(STATE, "onResume");
+        ID = sharedPreferences.getString("ID", "YA001"); // Load ID from Preference
+        tvid.setText(ID);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
-
     //Pause Status
     @Override
     protected void onPause() {
@@ -120,14 +130,12 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             unbindService(serviceConnection);
 //        unregisterReceiver(arduinoMessageReceiver);
     }
-
     @Override
     protected void onRestart() {
         super.onRestart();
         Log.e(STATE, "onRestart");
         isRestart = true;
     }
-
     //DESTROY STATUS
     @Override
     protected void onDestroy() {
@@ -136,10 +144,10 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         Log.e(STATE, "onDestroy");
         unregisterReceiver(arduinoMessageReceiver);
     }
-    //
-
     //<--Initialize View-->
     protected void initView() {
+        layoutMain = findViewById(R.id.layoutMain);
+        layoutMain.setBackgroundColor(getResources().getColor(R.color.White));
         btnSetting = findViewById(R.id.btnSetting);
         btnGridsize = findViewById(R.id.btnGridsize);
         mImageBorder = findViewById(R.id.PgvTarget);
@@ -153,11 +161,13 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         tvid = findViewById(R.id.app_id);
         rvShootresult = findViewById(R.id.rvShootresults);
         headerScroll = findViewById(R.id.headerScroll);
+        nsvTable = findViewById(R.id.NSVtable);
         initTargetList();
         setOnListener();
         initTable();
+        init_Paints();
     }
-
+    //init ID storage
     private void initPreferences() {
         sharedPreferences = getSharedPreferences("IDs",MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -165,18 +175,24 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         tvid.setText(ID);
     }
     //<--------------------------------init Activity Listener--------------------->
-    //Init Recycle VIew to show TARGET LIST
-    private void initTargetList() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        rvTarget = findViewById(R.id.rvTarget);
-        rvTarget.setLayoutManager(layoutManager);
-        targetAdapter = new TargetAdapter(MainActivity.this,bitmapArrayList,this);
-        rvTarget.setAdapter(targetAdapter);
-    }
     //Init Listener
     protected void setOnListener(){
         btnSetting.setOnClickListener(this);
         btnGridsize.setOnClickListener(this);
+//        nsvTable.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//
+//            }
+//        });
+//        nsvTable.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+//            @Override
+//            public void onScrollChanged() {
+//                int scrollX = nsvTable.getScrollX();
+//                Log.e("scrollX", String.valueOf(scrollX));
+//                headerScroll.scrollTo(scrollX, 0);
+//            }
+//        });
         //Make app id text animation on touch
         tvid.setSelected(false);
         tvid.setOnTouchListener(new View.OnTouchListener() {
@@ -211,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 scrollX += dx;
+//                Log.e("scrollX", String.valueOf(scrollX));
                 headerScroll.scrollTo(scrollX, 0);
             }
             @Override
@@ -219,7 +236,14 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             }
         });
     }
-
+    //Init Recycle VIew to show TARGET LIST
+    private void initTargetList() {
+        TargetlayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        rvTarget = findViewById(R.id.rvTarget);
+        rvTarget.setLayoutManager(TargetlayoutManager);
+        targetAdapter = new TargetAdapter(MainActivity.this,BitmapList_show,this);
+        rvTarget.setAdapter(targetAdapter);
+    }
     //Init ID dialog to change ID
     private void openIDdialog(){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
@@ -239,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 dialog.dismiss();
             }
         });
@@ -257,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
                     editor.commit();
                     tvid.setText(ID);
                     usbConnectionServices.updateID(ID);
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                     Toast.makeText(MainActivity.this, "ID changed successfully!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }
@@ -267,10 +293,17 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     protected void initTable() {
         FixedGridLayoutManager manager = new FixedGridLayoutManager();
         manager.setTotalColumnCount(1);
+        rvShootresult.setHasFixedSize(false);
         rvShootresult.setLayoutManager(manager);
+//        ViewCompat.setNestedScrollingEnabled(rvShootresult, false);
+        //fakedata();
         rvShootresult.addItemDecoration(new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL));
     }
-
+    protected void init_Paints(){
+        borderPaint.setStrokeWidth(8);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor((getResources().getColor(R.color.Red)));
+    }
     //<--OnClick View Event-->
     @Override
     public void onClick(View v) {
@@ -315,16 +348,16 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             Toast.makeText(MainActivity.this, "USB Service has stopped. Please restart app", Toast.LENGTH_SHORT).show();
         }
     };
-
     // Initialize Message receiver
     private void initArduinoMessagereceiver() {   // initialize Broadcast receiver
         arduinoMessageReceiver = new ArduinoMessageReceiver(this);
         IntentFilter MessageFilter = new IntentFilter();
         MessageFilter.addAction("Shooting_result");
         MessageFilter.addAction("Load_target");
+        MessageFilter.addAction("Show_lane");
+        MessageFilter.addAction("Show_temper");
         registerReceiver(arduinoMessageReceiver, MessageFilter);
     }
-
     private void openUSBconnection() {
         usbConnectionServices.openSerialport();
         final Handler handler = new Handler();
@@ -332,6 +365,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             @Override
             public void run() {
                 usbConnectionServices.check_USB_connection();
+//                String data = "&&"+(char)1+"YA001YA000"+(char)1+(char)(1)+(char)(0)+(char)(13)+(char)(10);
+//                usbConnectionServices.read_data(data);
             }
         }, 1000);
         handler.postDelayed(new Runnable() {
@@ -366,15 +401,17 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             resultList.add(new_shootList);
             shootList.clear();
             shootAdapter = new ShootAdapter(MainActivity.this, shootList, this);
-            rvShootresult.setAdapter(shootAdapter);
+            updateResultTable();
+            BitmapList_show.set(Target_previous-1,BitmapList_origin.get(Target_previous-1));;
         }
         setTimer(Integer.parseInt(time));
         target_frame.targetSize(value);
         Target_Frame tmp_target = new Target_Frame(target_frame);
         TargetList.add(tmp_target);
-        open_image(value);
         Target_count++;
         Target_select = Target_count;
+        Target_previous = Target_select;
+        open_image(value);
         tvTargetName.setText("Target name: " + value);
         mImageBorder.setGridsize(gridsize);
     }
@@ -387,8 +424,15 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         ) {
             bitmap = BitmapFactory.decodeStream(inputStream); //Load image
             mImageBorder.setNewImageBitmap(bitmap); //display image
-            bitmapArrayList.add(bitmap); // add bitmap to List View
+            Bitmap alteredBmp = resizeBitmap(bitmap);
+            BitmapList_origin.add(bitmap); // add origin bitmap to List View
+            // add border on new bitmap
+            alteredBmp =  alteredBmp.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas border_canvas = new Canvas(alteredBmp);
+            border_canvas.drawRect(2, 2, alteredBmp.getWidth()-2,alteredBmp.getHeight()-2,borderPaint);
+            BitmapList_show.add(alteredBmp); // add show bitmap to List View
             targetAdapter.notifyDataSetChanged();
+            TargetlayoutManager.scrollToPosition(Target_count-1);
         } catch (IOException e) {
 
         }
@@ -403,21 +447,19 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         mImageBorder.update_latest_result(id,x,y);
         if (Target_count == Target_select) { //If the result showed on board is table is the latest one
             shootAdapter = new ShootAdapter(MainActivity.this, shootList, this);
-            rvShootresult.setAdapter(shootAdapter);
+            updateResultTable();
             mImageBorder.Update_Result(id, x, y); //update result on UI
         }
     }
-
     @Override
-    public void show_temper(int T, int L, String ID) {
+    public void show_temper(int T) {
         float temp = (float) T / 10;
         tvtemp.setText(Float.toString(temp));
-        tvFrameNo.setText(Integer.toString(L));
-        this.ID=ID;
-        usbConnectionServices.updateID(ID);
-        tvid.setText(ID);
     }
-
+    @Override
+    public void show_lane(int L) {
+        tvFrameNo.setText(Integer.toString(L));
+    }
     public void setTimer(int time) {
         long msTime = time * 1000;
         if (timer != null) {
@@ -438,7 +480,6 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             }
         }.start();
     }
-
     //Apply grid size
     @Override
     public void applysize(int value) {
@@ -455,6 +496,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             selected_result = resultList.get(Target_select - 1).get(pos);
         int focus_bullet = Integer.parseInt(selected_result.getNo());
         mImageBorder.setFocusBullet(focus_bullet);
+        updateResultTable();
     }
     //On Target Image click event
     @Override
@@ -473,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             shootAdapter = new ShootAdapter(MainActivity.this, resultList.get(position), this); //update Shoot result
             mImageBorder.update_target(TargetList.get(position)); //update Target Frame
         }
-        mImageBorder.openImageBitmap(bitmapArrayList.get(position),Target_select);
+        mImageBorder.openImageBitmap(BitmapList_origin.get(position),Target_select);
         if (Target_select == Target_count) {// if selected target is the latest
             shootAdapter = new ShootAdapter(MainActivity.this, shootList, this); //update latest Shoot result
             mImageBorder.update_target(target_frame); // update latest target
@@ -484,9 +526,57 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             mImageBorder.update_target(TargetList.get(position)); //update Target Frame
             FrameName = TargetList.get(position).getName();
         }
-        mImageBorder.openImageBitmap(bitmapArrayList.get(position),Target_select);
-        rvShootresult.setAdapter(shootAdapter);
-        tvFrameNo.setText(FrameName);
+        mImageBorder.openImageBitmap(BitmapList_origin.get(position),Target_select);    //update target image
+        updateResultTable();
+        tvFrameNo.setText(FrameName);   //update target name
+        //update Target list
+        BitmapList_show.set(Target_previous-1,BitmapList_origin.get(Target_previous-1));
+        Bitmap alteredBmp =  resizeBitmap(BitmapList_origin.get(position).copy(Bitmap.Config.ARGB_8888, true));
+        Canvas border_canvas = new Canvas(alteredBmp);
+        border_canvas.drawRect(2, 2, alteredBmp.getWidth()-2,alteredBmp.getHeight()-2,borderPaint);
+        BitmapList_show.set(position,alteredBmp);
+        targetAdapter.notifyDataSetChanged();
+        Target_previous=Target_select;
     }
+    //<-------------------------reuse function--------------------------->>
+    private Bitmap resizeBitmap(Bitmap bm){
+        int bheight = bm.getHeight();
+        int bwidth = bm.getWidth();
+        int newWidth=105,newHeight=105;
+        Bitmap resizedBitmap1 = Bitmap.createScaledBitmap(bm,(int)bwidth,(int)bheight,true);
+        float scaleWidth = ((float) newWidth) / bwidth;
+        float scaleHeight = ((float) newHeight) / bheight;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(Math.min(scaleWidth, scaleHeight), Math.min(scaleWidth, scaleHeight));
+        Bitmap resizedBitmap2 = Bitmap.createBitmap(
+                resizedBitmap1, 0, 0, (int)bwidth, (int)bheight, matrix, false);
+        Bitmap outputimage = Bitmap.createBitmap(newWidth,newHeight, Bitmap.Config.ARGB_8888);
+        // "RECREATE" THE NEW BITMAP
+        Canvas can = new Canvas(outputimage);
+        can.drawBitmap(resizedBitmap2, ((float)(newWidth- resizedBitmap2.getWidth()) / 2), ((float)(newHeight - resizedBitmap2.getHeight()) / 2), null);
+        return outputimage;
+    }
+    private void fakedata(){
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        shootAdapter = new ShootAdapter(MainActivity.this, shootList, this);
+        updateResultTable();
+    }
+    private void updateResultTable(){
+        rvShootresult.setAdapter(shootAdapter);         //update result table
+        scrollX =0;
+        headerScroll.scrollTo(0, 0);
 
+    }
 }

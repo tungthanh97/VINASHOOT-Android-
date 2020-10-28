@@ -3,6 +3,7 @@ package com.example.vns_handheld004;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
@@ -45,6 +46,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
     private String ID;
     private Button btZIG,btLAN,btRS485;
     private TextView tvid,tvZIG,tvLAN,tvRS485;
+    ConstraintLayout layoutSetting;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -57,6 +59,8 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         initPreferences();
     }
     protected void initView(){
+        layoutSetting = findViewById(R.id.layoutSetting);
+        layoutSetting.setBackgroundColor(getResources().getColor(R.color.White));
         swUSB= findViewById(R.id.sw_usb);
         swUSB.setOnClickListener(this);
         btZIG=  findViewById(R.id.bt_zig);
@@ -135,6 +139,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 dialog.dismiss();
             }
         });
@@ -153,6 +158,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
                     editor.commit();
                     tvid.setText(ID);
                     usbConnectionServices.updateID(ID);
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                     Toast.makeText(SettingActivity.this, "ID changed successfully!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }
@@ -243,10 +249,14 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
 
     }
     @Override
-    public void show_temper(int T, int L, String ID) {
-        String title = "VINASHOOT HANDHELD ID:" + ID;
-        tvid.setText(title);
+    public void show_temper(int T) {
     }
+
+    @Override
+    public void show_lane(int L) {
+
+    }
+
     @Override
     public void connectStatus(String result) {
         switch (result) {

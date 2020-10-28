@@ -47,7 +47,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
     public static final String ID_PC = "YA000";//5 byte
     public static final String SEND_START = "@@";
     public static final String RECEIVE_START = "&&";
-    public static final String MSG_STOP = ">>";
+    public static String MSG_STOP = ">>";
     private String message = null;
     private int shoot_count = 0;
     private boolean is_connected = false;
@@ -71,6 +71,10 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(broadcastReceiver, filter);
+        StringBuilder sb = new StringBuilder();
+        sb.append((char)13);
+        sb.append((char)10);
+        MSG_STOP=sb.toString();
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -136,9 +140,16 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         }
     };
     private void ArduinoAttached() {
+        final Handler handler = new Handler();
         Toast.makeText(USBConnectionServices.this, "ARDUINO ATTACHED", Toast.LENGTH_SHORT).show();
         Log.e("Arduino","Attached");
         openSerialport();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                openUSBconnection();
+            }
+        }, 1000);
     }     //When Arduino attached
     private void connected_broadcast() {            //send connected broadcast
         is_connected = true;
@@ -294,7 +305,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
 //        Log.e("Arduino", "Receive Message");
         try {
             data = new String(arg0, "ISO-8859-1");
-//            Log.e("Message:", data);
+            Log.e("Message:", data);
             read_data(data);
         } catch (UnsupportedEncodingException e) {
             Log.e("Arduino:", "msg error");
@@ -316,17 +327,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             message = null;
         }
     }
-    public static String textToHex(String text) {
-        byte[] buf = null;
-        buf = text.getBytes(encodingType);
-        char[] HEX_CHARS = "0123456789abcdef".toCharArray();
-        char[] chars = new char[2 * buf.length];
-        for (int i = 0; i < buf.length; ++i) {
-            chars[2 * i] = HEX_CHARS[(buf[i] & 0xF0) >>> 4];
-            chars[2 * i + 1] = HEX_CHARS[buf[i] & 0x0F];
-        }
-        return new String(chars);
-    }    //convert text to hex
+
     protected int data_length(String msg) {
         char ch = msg.charAt(2);
         return (int)ch;
@@ -362,9 +363,9 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         return (ID_receive.equals(ID_Phone) && ID_send.equals(ID_PC));
     }    //check received message id
     protected boolean match_received_msg(String msg) {
-        if ((Message_command(msg)!=1) && (!is_connected)) return false;
         if (!match_msg_length(msg)) return false;
-        if (!match_checksum(msg)) return false;
+        if ((Message_command(msg)!=1) && (!is_connected)) return false;
+        //if (!match_checksum(msg)) return false;
         if (!match_id(msg)) return false;
 
         return true;
@@ -382,6 +383,9 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
                 shooting_result(msg);
                 break;
             case 4:
+                show_lane(msg);
+                break;
+            case 5:
                 show_temper(msg);
                 break;
             case 7:
@@ -431,7 +435,6 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
 //            send_data(3,1,"0");
             return;
         }
-        send_data(3,1,Character.toString((char)1)); //Confirm data received
         shoot_count ++;
         String No = Integer.toString(shoot_count);
         String X = Integer.toString(Sbyte_to_int(data.substring(0,2))-32768);
@@ -455,19 +458,28 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
     }    // Receive shoot result
     private void show_temper(String msg) { //command code 04
         String data= Message_data(msg);
-        if (data.length() != 8){
+        if (data.length() != 3){
 //            send_data(2,1,"0");
             return;
         }
-        send_data(4,1,Character.toString((char)1));
-        int T = Sbyte_to_int(data.substring(0,2));
-        int L = data.charAt(2) & 0xFF;
-        String ID = data.substring(3);
+        int T = String2Int(data);
+
         Intent intent = new Intent();
         intent.setAction("Show_temper");
         intent.putExtra("Temperature",T);
-        intent.putExtra("FrameNo",L);
-        intent.putExtra("ID",ID);
+        sendBroadcast(intent);
+    }   // Receive temperature, Frame Name and ID
+    private void show_lane(String msg) { //command code 05
+        String data= Message_data(msg);
+        if (data.length() != 1){
+//            send_data(2,1,"0");
+            return;
+        }
+        int L = data.charAt(0) & 0xFF;
+
+        Intent intent = new Intent();
+        intent.setAction("Show_lane");
+        intent.putExtra("Lane",L);
         sendBroadcast(intent);
     }   // Receive temperature, Frame Name and ID
     public void checkZIGconnection(){  //command code 07
@@ -501,6 +513,29 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         }
     }
     public void updateID(String ID){
+        send_data(4,5,ID);
         this.ID_Phone=ID;
+
+    }
+    //re-use FUnction
+    public static String textToHex(String text) //convert text to hex
+    {
+        byte[] buf = null;
+        buf = text.getBytes(encodingType);
+        char[] HEX_CHARS = "0123456789abcdef".toCharArray();
+        char[] chars = new char[2 * buf.length];
+        for (int i = 0; i < buf.length; ++i) {
+            chars[2 * i] = HEX_CHARS[(buf[i] & 0xF0) >> 4];
+            chars[2 * i + 1] = HEX_CHARS[buf[i] & 0x0F];
+        }
+        return new String(chars);
+    }
+    public int String2Int(String s) //Convert integer String to integer
+    {
+        int result=0;
+        for (int i=0;i<s.length();i++){
+            result = result *10 + Integer.parseInt(String.valueOf(s.charAt(i)));
+        }
+        return result;
     }
 }

@@ -13,6 +13,7 @@ public class Shoot_result
     public String Mark;
     public String M_H;
     public String Time;
+
     public String getNo() {
         return No;
     }

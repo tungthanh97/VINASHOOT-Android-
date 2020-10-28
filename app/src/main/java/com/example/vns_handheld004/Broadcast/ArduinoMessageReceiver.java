@@ -29,11 +29,13 @@ public class ArduinoMessageReceiver extends BroadcastReceiver {
                 Shoot_result shoot_result = new Shoot_result(result);
                 listener.shootResults(shoot_result);
                 break;
-            case "Show_temper": //cmd 04
+            case "Show_temper": //cmd 05
                 int T = intent.getIntExtra("Temperature",0);
-                int L = intent.getIntExtra("FrameNo",0);
-                String ID = intent.getStringExtra("ID");
-                listener.show_temper(T,L,ID);
+                listener.show_temper(T);
+                break;
+            case "Show_lane": //cmd 04
+                int L = intent.getIntExtra("Lane",0);
+                listener.show_lane(L);
                 break;
             case "USBdisconnected":
                 listener.connectStatus("USBdisconnected");

@@ -9,7 +9,6 @@
         android:layout_width="@dimen/imgTargetW"
         android:layout_height="@dimen/imgTargetH"
         android:scaleType="fitCenter"
-        android:background="@drawable/border">
-    </ImageView>
+        android:background="@drawable/border" />
 
 </LinearLayout>
