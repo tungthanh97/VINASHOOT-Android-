@@ -28,4 +28,11 @@
     <string name="Time">Time</string>
     <string name="IDconfig">Config user ID:</string>
     <string name="vinashoot">VINASHOOT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="bluetooth">BLUETOOTH</string>
+    <string name="No_connection">No Connection</string>
+    <string name="empty_list">No Device available</string>
+    <string name="ID_PHONE">HD001</string>
+    <string name="bluetoothStatus">Connect to nearby device</string>
 </resources>

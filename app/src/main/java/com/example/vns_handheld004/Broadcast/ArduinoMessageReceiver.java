@@ -22,7 +22,8 @@ public class ArduinoMessageReceiver extends BroadcastReceiver {
             case "Load_target": //cmd 002
                 String target_code = intent.getStringExtra("target code");
                 String Countdown = intent.getStringExtra("time");
-                listener.showTarget(target_code, Countdown);
+                String lane =intent.getStringExtra("lane");
+                listener.showTarget(target_code, Countdown,lane);
                 break;
             case "Shooting_result": //cmd 003
                 String[] result= intent.getStringArrayExtra("Results");
@@ -30,12 +31,8 @@ public class ArduinoMessageReceiver extends BroadcastReceiver {
                 listener.shootResults(shoot_result);
                 break;
             case "Show_temper": //cmd 05
-                int T = intent.getIntExtra("Temperature",0);
+                String T = intent.getStringExtra("Temperature");
                 listener.show_temper(T);
-                break;
-            case "Show_lane": //cmd 04
-                int L = intent.getIntExtra("Lane",0);
-                listener.show_lane(L);
                 break;
             case "USBdisconnected":
                 listener.connectStatus("USBdisconnected");

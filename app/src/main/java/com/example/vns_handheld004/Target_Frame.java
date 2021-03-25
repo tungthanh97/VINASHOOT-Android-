@@ -11,14 +11,15 @@ public class Target_Frame {
     public Target_Frame(Context context){
         this.context = context;
     }
-
     public Target_Frame(Target_Frame that) {
-        this(that.gettarget_width(),that.gettarget_height());
+        this(that.name, that.gettarget_width(),that.gettarget_height());
     }
-    public Target_Frame(int width, int height){
+    public Target_Frame(String name, int width, int height){
+        this.name = name;
         this.target_width = width;
         this.target_height = height;
     }
+
     public int gettarget_height() {
         return this.target_height;
     }
@@ -34,7 +35,9 @@ public class Target_Frame {
     public void settarget_width(int target_width) {
         this.target_width = target_width;
     }
-
+    public void setName(String targetName) {
+        this.name = targetName;
+    }
     public String getName() {
         return name;
     }
@@ -46,7 +49,6 @@ public class Target_Frame {
             case "1":
                 this.target_width = 150;
                 this.target_height = 150;
-
                 break;
             case "2":
                 this.target_width = 300;
@@ -176,6 +178,7 @@ public class Target_Frame {
             case "18":
                 this.target_width = 2900;
                 this.target_height = 730;
+                break;
             case "18b":
                 this.target_width = 4000;
                 this.target_height = 1100;
@@ -185,8 +188,16 @@ public class Target_Frame {
                 this.target_width = 1000;
                 this.target_height = 1500;
                 break;
+            case "A11":
+                this.target_width = 410;
+                this.target_height = 1120;
+                break;
+            case "A12":
+                this.target_width = 415;
+                this.target_height = 550;
+                break;
             default:
-                Toast.makeText(context,"Target Frame not exist",Toast.LENGTH_SHORT);
+                Toast.makeText(context,"Target Frame not exist",Toast.LENGTH_SHORT).show();
         }
     }
 

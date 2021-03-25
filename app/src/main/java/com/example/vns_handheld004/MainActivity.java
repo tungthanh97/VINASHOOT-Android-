@@ -1,5 +1,9 @@
 package com.example.vns_handheld004;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -48,6 +53,7 @@ import com.example.vns_handheld004.Adapter.TargetAdapter;
 import com.example.vns_handheld004.Broadcast.ArduinoMessageReceiver;
 import com.example.vns_handheld004.Broadcast.MyBroadcastListener;
 import com.example.vns_handheld004.Model.Shoot_result;
+import com.example.vns_handheld004.Services.BluetoothServices;
 import com.example.vns_handheld004.Services.USBConnectionServices;
 import com.example.vns_handheld004.Util.FixedGridLayoutManager;
 import com.example.vns_handheld004.View.PixelGridView;
@@ -56,7 +62,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener,TargetDialog.TargetDialogListener,ShootAdapter.OnTableViewListener,TargetAdapter.OnTargetClickListener {
@@ -66,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private boolean idUSBConnectionService = false, isRestart = false;
     private Intent intent;
     private String ID;
-    private USBConnectionServices usbConnectionServices;
+    private BluetoothServices bluetoothServices;
     private ImageButton btnSetting, btnGridsize;
     private PixelGridView mImageBorder;
     private TextView tvtime, tvtemp, tvFrameNo, tvid, tvTargetName;
@@ -75,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private static CountDownTimer timer;
     private Target_Frame target_frame = new Target_Frame(this);
     private TargetAdapter targetAdapter ;
-    private AlertDialog dialog;
     private LinearLayoutManager TargetlayoutManager;
     private ConstraintLayout layoutMain;
     int scrollX = 0;
@@ -85,7 +93,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     SharedPreferences.Editor editor;
     List<Target_Frame> TargetList = new ArrayList<>();
     List<Shoot_result> shootList = new ArrayList<>();
-    ArrayList<List<Shoot_result>> resultList= new ArrayList<>();
+    List<List<Shoot_result>> resultList= new ArrayList<>();
+    List<String> laneList = new ArrayList<>();
     RecyclerView rvShootresult,rvTarget;
     NestedScrollView nsvTable;
     HorizontalScrollView headerScroll;
@@ -98,9 +107,17 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         Log.e(STATE, "onCreate");
         initView();
         initPreferences();
-        intent = new Intent(MainActivity.this, USBConnectionServices.class);
-        startService(intent);
+        intent = new Intent(MainActivity.this, BluetoothServices.class);
+        if (isMyServiceRunning()) stopService(intent);
+        try {
+            startService(intent );
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(this,"Please shut down previous running app",Toast.LENGTH_SHORT).show();
+        }
         initArduinoMessagereceiver();
+        checkBTPermission();
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -116,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     protected void onResume() {
         super.onResume();
         Log.e(STATE, "onResume");
-        ID = sharedPreferences.getString("ID", "YA001"); // Load ID from Preference
+        ID = sharedPreferences.getString("ID", "HD001"); // Load ID from Preference
         tvid.setText(ID);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
@@ -162,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         rvShootresult = findViewById(R.id.rvShootresults);
         headerScroll = findViewById(R.id.headerScroll);
         nsvTable = findViewById(R.id.NSVtable);
+
         initTargetList();
         setOnListener();
         initTable();
@@ -171,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private void initPreferences() {
         sharedPreferences = getSharedPreferences("IDs",MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        ID = sharedPreferences.getString("ID", "YA001"); // Load ID from Preference
+        ID = sharedPreferences.getString("ID", "HD001"); // Load ID from Preference
         tvid.setText(ID);
     }
     //<--------------------------------init Activity Listener--------------------->
@@ -281,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
                     editor.putString("ID", ID);
                     editor.commit();
                     tvid.setText(ID);
-                    usbConnectionServices.updateID(ID);
+                    bluetoothServices.updateID(ID);
                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                     Toast.makeText(MainActivity.this, "ID changed successfully!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -314,6 +332,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
                 break;
             }
             case R.id.btnGridsize:
+                //bluetoothServices.sendShootResult();
                 openGridDialog();
                 break;
         }
@@ -333,19 +352,21 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
             Log.e(STATE, "onServiceConnected");
+            BluetoothServices.CallService bider = (BluetoothServices.CallService) iBinder;
+            bluetoothServices = bider.getService();
             idUSBConnectionService = true;
-            USBConnectionServices.CallService bider = (USBConnectionServices.CallService) iBinder;
-            usbConnectionServices = bider.getService();
-            usbConnectionServices.updateID(ID);
-            if (!isRestart)
-                openUSBconnection();
+            bluetoothServices.ID_Phone = ID;
+            if (!isRestart) {
+                bluetoothServices.updateID(ID);
+                openSetting();
+            }
         }
-
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.e(STATE, "onServiceConnected");
             idUSBConnectionService = false;
-            Toast.makeText(MainActivity.this, "USB Service has stopped. Please restart app", Toast.LENGTH_SHORT).show();
+            bluetoothServices = null;
+            Toast.makeText(MainActivity.this, "Bluetooth has disconnected", Toast.LENGTH_SHORT).show();
         }
     };
     // Initialize Message receiver
@@ -358,27 +379,15 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         MessageFilter.addAction("Show_temper");
         registerReceiver(arduinoMessageReceiver, MessageFilter);
     }
-    private void openUSBconnection() {
-        usbConnectionServices.openSerialport();
+    private void openSetting() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                usbConnectionServices.check_USB_connection();
-//                String data = "&&"+(char)1+"YA001YA000"+(char)1+(char)(1)+(char)(0)+(char)(13)+(char)(10);
-//                usbConnectionServices.read_data(data);
-            }
-        }, 1000);
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
                 Intent intent2 = new Intent(MainActivity.this, SettingActivity.class);
-                if (!usbConnectionServices.getArduinoStatus()) {
-                    startActivity(intent2);
-                    Log.e("ACTION:", "OPEN SETTING");
+                startActivity(intent2);
                 }
-            }
-        }, 2000);
+            }, 2000);
     }
 
     //<--------------------------Handle command from PC------------------------>
@@ -394,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         return tmp;
     }
     @Override
-    public void showTarget(String value, String time) { //Show target frame
+    public void showTarget(String value, String time,String lane) { //Show target frame
         List<Shoot_result> new_shootList = new_shootList(shootList);
         while (value.charAt(0) == '0') value = value.substring(1);
         if (Target_count != 0){
@@ -405,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
             BitmapList_show.set(Target_previous-1,BitmapList_origin.get(Target_previous-1));;
         }
         setTimer(Integer.parseInt(time));
+        target_frame.setName(value);
         target_frame.targetSize(value);
         Target_Frame tmp_target = new Target_Frame(target_frame);
         TargetList.add(tmp_target);
@@ -412,8 +422,12 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         Target_select = Target_count;
         Target_previous = Target_select;
         open_image(value);
-        tvTargetName.setText("Target name: " + value);
+        tvTargetName.setText(value);
+        if (value.equals("A11")) tvTargetName.setText("AARM-11");
+        if (value.equals("A12")) tvTargetName.setText("AARM-12");
         mImageBorder.setGridsize(gridsize);
+        tvFrameNo.setText(lane);
+        laneList.add(lane);
     }
     //<--Open Image -->
     protected void open_image(String image_name) {
@@ -452,13 +466,10 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         }
     }
     @Override
-    public void show_temper(int T) {
-        float temp = (float) T / 10;
-        tvtemp.setText(Float.toString(temp));
-    }
-    @Override
-    public void show_lane(int L) {
-        tvFrameNo.setText(Integer.toString(L));
+    public void show_temper(String T) {
+//        float temp = (float) T / 10;
+        String temp = new StringBuilder(T).insert(2,".").toString();
+        tvtemp.setText(temp);
     }
     public void setTimer(int time) {
         long msTime = time * 1000;
@@ -490,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     @Override
     public void onTableClick(int pos) {
         Shoot_result selected_result;
-        if (Target_select == Target_count)
+        if (Target_select == Target_count) //select the last one
             selected_result = shootList.get(pos);
         else
             selected_result = resultList.get(Target_select - 1).get(pos);
@@ -505,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     }
     // update Target list
     protected void update_selected_target(int position){ // update table and bitmap with clicked Target
-        String FrameName;
+        String targetName, lane;
         Target_select = position+1;
         if (Target_select == Target_count) {// if selected target is the latest
             shootAdapter = new ShootAdapter(MainActivity.this, shootList, this); //update latest Shoot result
@@ -519,16 +530,20 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         if (Target_select == Target_count) {// if selected target is the latest
             shootAdapter = new ShootAdapter(MainActivity.this, shootList, this); //update latest Shoot result
             mImageBorder.update_target(target_frame); // update latest target
-            FrameName = target_frame.getName();
+            targetName = target_frame.getName();
         }
         else {
             shootAdapter = new ShootAdapter(MainActivity.this, resultList.get(position), this); //update Shoot result
             mImageBorder.update_target(TargetList.get(position)); //update Target Frame
-            FrameName = TargetList.get(position).getName();
+            targetName  = TargetList.get(position).getName();
         }
+        lane = laneList.get(position);
+        tvFrameNo.setText(lane);
         mImageBorder.openImageBitmap(BitmapList_origin.get(position),Target_select);    //update target image
         updateResultTable();
-        tvFrameNo.setText(FrameName);   //update target name
+        tvTargetName.setText( targetName );   //update target name
+        if (targetName .equals("A11")) tvTargetName.setText("AARM-11");
+        if (targetName .equals("A12")) tvTargetName.setText("AARM-12");
         //update Target list
         BitmapList_show.set(Target_previous-1,BitmapList_origin.get(Target_previous-1));
         Bitmap alteredBmp =  resizeBitmap(BitmapList_origin.get(position).copy(Bitmap.Config.ARGB_8888, true));
@@ -577,6 +592,26 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         rvShootresult.setAdapter(shootAdapter);         //update result table
         scrollX =0;
         headerScroll.scrollTo(0, 0);
-
     }
+    @SuppressLint("NewApi")
+    private  void checkBTPermission()
+    {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
+            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
+            if (permissionCheck != 0){
+                this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},1001);
+            }
+        }
+    }
+    private boolean isMyServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (service.service.getClassName().contains(".Services.BluetoothServices")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

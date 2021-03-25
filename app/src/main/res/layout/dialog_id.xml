@@ -36,7 +36,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical|start"
             android:background="@drawable/border"
-            android:text="YA001"
+            android:text="@string/ID_PHONE"
             android:textSize="22sp"
             android:maxLength="5"
             android:inputType="textCapCharacters">

@@ -1,12 +1,7 @@
 package com.example.vns_handheld004;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.res.ResourcesCompat;
-
-import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,42 +9,48 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.vns_handheld004.Services.BluetoothServices;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.vns_handheld004.Broadcast.ArduinoMessageReceiver;
 import com.example.vns_handheld004.Broadcast.MyBroadcastListener;
 import com.example.vns_handheld004.Model.Shoot_result;
 import com.example.vns_handheld004.Services.USBConnectionServices;
 
-import org.w3c.dom.Text;
-
 public class SettingActivity extends AppCompatActivity implements MyBroadcastListener, View.OnClickListener {
     //Declaration
     ArduinoMessageReceiver arduinoMessageReceiver;
     private static final String STATE = "Setting";
     private boolean idUSBConnectionService = false, isTouched = false;;
-    private USBConnectionServices usbConnectionServices;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothServices bluetoothServices;
     private SwitchCompat swUSB;
     private String ID;
     private Button btZIG,btLAN,btRS485;
-    private TextView tvid,tvZIG,tvLAN,tvRS485;
+    private TextView tvid,tvBluetooth,tvZIG,tvLAN,tvRS485;
+    private CardView cvBluetooth;
+    private static String Bluetooth_connected_device ="";
     ConstraintLayout layoutSetting;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-
+    //region Initialize------------------------
     @Override           //OnCreate
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +58,9 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         setContentView(R.layout.activity_setting_activities);
         initView();
         initPreferences();
+        checkBluetoth();
     }
+
     protected void initView(){
         layoutSetting = findViewById(R.id.layoutSetting);
         layoutSetting.setBackgroundColor(getResources().getColor(R.color.White));
@@ -70,32 +73,39 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         btRS485= findViewById(R.id.bt_rs485);
         btRS485.setOnClickListener(this);
         tvid = findViewById(R.id.app_id);
+        tvBluetooth =findViewById(R.id.tvBluetoothSTT);
         tvZIG = findViewById(R.id.tvZIGstt);
         tvLAN = findViewById(R.id.tvLANstt);
         tvRS485 = findViewById(R.id.tvRSstt);
+        cvBluetooth =findViewById(R.id.cvBluetooth);
+        cvBluetooth.setOnClickListener(this);
         initSwitch();
         initIDlistener();
     }     //Initialize View
     private void initPreferences() {
         sharedPreferences = getSharedPreferences("IDs",MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        ID = sharedPreferences.getString("ID", "YA001");
+        ID = sharedPreferences.getString("ID", "HD001");
         tvid.setText(ID);
     }     // init shared prefrence to save ID
     private void initSwitch(){
+       ;
         swUSB.setOnTouchListener((view, motionEvent) -> {
             isTouched = true;
             return false;
         });
-
         swUSB.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isTouched) {
                 isTouched = false;
                 if (isChecked) {
-                    usbConnectionServices.openUSBconnection();
+                    boolean kt = bluetoothServices.turnOnBluetooth();
+                    //if (!(kt && bluetoothServices.getBluetoothStatus())) swUSB.setChecked(false);
                 }
                 else {
-                    usbConnectionServices.closeUSBconnection();
+                    boolean kt = bluetoothServices.turnOffBluetooth();
+                    tvBluetooth.setText("Connect to nearby device");
+                    Bluetooth_connected_device = "";
+                    if (!kt && bluetoothServices.getBluetoothStatus()) swUSB.setChecked(true);
                 }
             }
         });
@@ -121,6 +131,8 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
             }
         });
     }     //setup ID config dialog
+    //endregion------------------------------------
+    //region Event Handler
     private void openIDdialog(){     // open ID dialog to change ID
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(SettingActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_id,null);
@@ -157,7 +169,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
                     editor.putString("ID", ID);
                     editor.commit();
                     tvid.setText(ID);
-                    usbConnectionServices.updateID(ID);
+                    bluetoothServices.updateID(ID);
                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                     Toast.makeText(SettingActivity.this, "ID changed successfully!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -169,18 +181,22 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_zig:{
-                usbConnectionServices.checkZIGconnection();
+                bluetoothServices.checkZIGconnection();
                 checking(tvZIG);
                 break;
             }
             case R.id.bt_lan:{
-                usbConnectionServices.checkLANconnection();
+                bluetoothServices.checkLANconnection();
                 checking(tvLAN);
                 break;
             }
             case R.id.bt_rs485:{
-                usbConnectionServices.checkRS485connection();
+                bluetoothServices.checkRS485connection();
                 checking(tvRS485);
+                break;
+            }
+            case R.id.cvBluetooth:{
+                open_BT_dialog();
                 break;
             }
         }
@@ -191,7 +207,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         handler.postDelayed(new Runnable() {
             public void run() {
                 String text = textView.getText().toString();
-                if (text.equals("Checking...")) textView.setText("Disconnected");
+                if (text.equals("Checking...")) textView.setText("No Connection");
             }
         }, 3000);
     }
@@ -199,9 +215,10 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
     protected void onResume() {     //On Resume
         super.onResume();
         Log.e(STATE,"onResume");
-        Intent intent = new Intent(SettingActivity.this, USBConnectionServices.class);
+        Intent intent = new Intent(SettingActivity.this, BluetoothServices.class);
         bindService(intent,serviceConnection2,BIND_AUTO_CREATE);
         initArduinoMessagereceiver();
+
     }
     @Override     //Pause Status
     protected void onPause() {
@@ -210,16 +227,21 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
             unbindService(serviceConnection2);
         unregisterReceiver(arduinoMessageReceiver);
     }
-    //<<-----------------------Setup Connection--------------------->>
+    //endregion-----------------------
+    //region Setup Connection------------------------
     ServiceConnection serviceConnection2 = new ServiceConnection() { //Service connection
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
             Log.e(STATE,"onServiceConnected");
             idUSBConnectionService = true;
-            USBConnectionServices.CallService bider =(USBConnectionServices.CallService) iBinder;
-            usbConnectionServices = bider.getService();
-            usbConnectionServices.updateID(ID);
-            if (usbConnectionServices.getArduinoStatus())
+            BluetoothServices.CallService bider =(BluetoothServices.CallService) iBinder;
+            bluetoothServices = bider.getService();
+            if (bluetoothServices.isBluetoothDeviceConnected() && Bluetooth_connected_device != "")  tvBluetooth.setText("Connected to "+Bluetooth_connected_device);
+            else {
+                tvBluetooth.setText("Connect to nearby device");
+                Bluetooth_connected_device = "";
+            }
+            if (bluetoothServices.getBluetoothStatus())
                 swUSB.setChecked(true);
             else
                 swUSB.setChecked(false);
@@ -227,7 +249,8 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         @Override
         public void onServiceDisconnected(ComponentName name) {
             idUSBConnectionService = false;
-            Toast.makeText(SettingActivity.this, "USB Service has stopped. Please restart app", Toast.LENGTH_SHORT).show();
+            bluetoothServices = null;
+            Toast.makeText(SettingActivity.this, "Bluetooth has disconnected", Toast.LENGTH_SHORT).show();
         }
     };
     private void initArduinoMessagereceiver(){   // initialize Broadcast receiver
@@ -240,32 +263,28 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         Connect_update.addAction("RS485connected");
         registerReceiver(arduinoMessageReceiver,Connect_update);
     }     //Init Broadcast Receiver
+    public void connectBT(BluetoothDevice mBTdevice)
+    {
+        Bluetooth_connected_device = mBTdevice.getName();
+        bluetoothServices.connectBT(mBTdevice);
+    }
+    private void checkBluetoth(){
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
+    private void showToast(String msg){
+        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+    }
     //<--------------------------Handle command from PC------------------------>
-    @Override
-    public void showTarget(String value, String time) { //Show target frame
-    }
-    @Override
-    public void shootResults(Shoot_result shoot_result) {
-
-    }
-    @Override
-    public void show_temper(int T) {
-    }
-
-    @Override
-    public void show_lane(int L) {
-
-    }
-
     @Override
     public void connectStatus(String result) {
         switch (result) {
             case "USBconnected": {
-                swUSB.setChecked(true);
+                tvBluetooth.setText("Connected to "+Bluetooth_connected_device);
                 break;
             }
             case "USBdisconnected": {
-                swUSB.setChecked(false);
+                tvBluetooth.setText("Connect to nearby device");
+                Bluetooth_connected_device = "";
                 break;
             }
             case "ZIGconnected":{
@@ -285,4 +304,24 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
     public void connectedStatus(TextView textView){
         textView.setText("Connected");
     }
+    //BLUETOOTH
+    private void open_BT_dialog()
+    {
+        if (!bluetoothServices.getBluetoothStatus()) return;
+        BluetoothDialog bluetoothDialog = new BluetoothDialog();
+        bluetoothDialog.show(getSupportFragmentManager(), "Bluetooth Dialog");
+    }
+    //just useless override
+    @Override
+    public void showTarget(String value, String time,String lane) { //Show target frame
+    }
+    @Override
+    public void shootResults(Shoot_result shoot_result) {
+
+    }
+    @Override
+    public void show_temper(String T) {
+    }
+
+    //endregion
 }

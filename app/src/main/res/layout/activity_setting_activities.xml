@@ -55,7 +55,7 @@
             android:layout_gravity="center_vertical|start"
             android:layout_weight="1"
             android:background="@drawable/id_selector"
-            android:text="YA001"
+            android:text="@string/ID_PHONE"
             android:textColor="@color/Black"
             android:textSize="17sp" />
     </LinearLayout>
@@ -76,202 +76,239 @@
         app:layout_constraintVertical_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutlogo" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutButtons"
-        android:layout_width="359dp"
-        android:layout_height="329dp"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:orientation="vertical"
-        android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings">
-
-        <TextView
-            android:id="@+id/tvZIGstt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textColor="@color/Silver"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@+id/tvzigbee"
-            app:layout_constraintTop_toBottomOf="@+id/tvzigbee" />
-
-        <TextView
-            android:id="@+id/tvLANstt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textColor="@color/Silver"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@+id/tvZIGstt"
-            app:layout_constraintTop_toBottomOf="@+id/tvlan" />
-
-        <TextView
-            android:id="@+id/tvRSstt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textColor="@color/Silver"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@+id/tvLANstt"
-            app:layout_constraintTop_toBottomOf="@+id/tvrs485" />
-
-
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="71dp"
-            android:layout_height="45dp"
-            android:contentDescription="RS485"
-            android:src="@drawable/rs485"
+        <LinearLayout
+            android:id="@+id/layoutButtons"
+            android:layout_width="365dp"
+            android:layout_height="329dp"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintVertical_bias="0.2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvrs485" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="78dp"
-            android:layout_height="44dp"
-            android:contentDescription="ZIGBEE"
-            android:src="@drawable/wireless"
-            app:layout_constraintEnd_toEndOf="@+id/imageView3"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="@+id/tvzigbee" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="89dp"
-            android:layout_height="50dp"
-            android:contentDescription="LAN"
-            android:src="@drawable/rj45"
-            app:layout_constraintEnd_toEndOf="@+id/imageView4"
-            app:layout_constraintHorizontal_bias="0.526"
-            app:layout_constraintStart_toStartOf="@+id/imageView4"
-            app:layout_constraintTop_toTopOf="@+id/tvlan" />
-
-        <ImageView
-            android:layout_width="56dp"
-            android:layout_height="61dp"
-            android:contentDescription="USB"
-            android:src="@drawable/usb"
-            app:layout_constraintBottom_toBottomOf="@+id/usb"
-            app:layout_constraintEnd_toEndOf="@+id/imageView"
-            app:layout_constraintHorizontal_bias="0.59"
-            app:layout_constraintStart_toStartOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/usb"
-                app:layout_constraintVertical_bias="0.405" />
-
-            <TextView
-                android:id="@+id/usb"
-                android:layout_width="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/settings">
+            <androidx.cardview.widget.CardView
+                android:id = "@+id/cvBluetooth"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/usb"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/tvzigbee"
-                app:layout_constraintStart_toStartOf="@+id/tvzigbee"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <TextView
-                android:id="@+id/tvzigbee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1.0"
-                android:text="@string/zigbee"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/tvlan"
-                app:layout_constraintStart_toStartOf="@+id/tvlan"
-                app:layout_constraintTop_toBottomOf="@+id/usb" />
-
-            <TextView
-                android:id="@+id/tvlan"
-                android:layout_width="158dp"
-                android:layout_height="23dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1.0"
-                android:text="@string/lan"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/tvrs485"
-                app:layout_constraintStart_toStartOf="@+id/tvrs485"
-                app:layout_constraintTop_toBottomOf="@+id/tvzigbee" />
-
-            <TextView
-                android:id="@+id/tvrs485"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="24dp"
-                android:layout_weight="1.0"
-                android:text="@string/rs485"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView4"
-                app:layout_constraintTop_toBottomOf="@+id/tvlan" />
-
-            <LinearLayout
-                android:layout_width="75dp"
-                android:layout_height="266dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.96"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/sw_usb"
+                android:layout_margin="5dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+                <LinearLayout
+                    android:id="@+id/layoutBluetooth"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="13dp"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:theme="@style/SCBSwitch" />
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="61dp"
+                        android:contentDescription="USB"
+                        android:layout_marginStart="15dp"
+                        android:src="@drawable/usb" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|left"
+                        android:layout_marginStart="27dp"
+                        android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/bt_zig"
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    android:layout_marginTop="35dp"
-                    android:background="@drawable/button"
-                    android:gravity="center"
-                    android:text="@string/check"
-                    android:textColor="@color/Black" />
+                        <TextView
+                            android:id="@+id/tvBluetooth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/bluetooth"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvBluetoothSTT"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/bluetoothStatus"
+                            android:textColor="@color/Silver"
+                            android:textSize="12sp" />
 
-                <Button
-                    android:id="@+id/bt_lan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    android:layout_marginTop="35dp"
-                    android:background="@drawable/button"
-                    android:gravity="center"
-                    android:text="@string/check"
-                    android:textColor="@color/Black" />
+                    </LinearLayout>
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_usb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="50dp"
+                        android:layout_marginEnd="13dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:theme="@style/SCBSwitch" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+                <LinearLayout
+                    android:id="@+id/layoutZIG"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="80dp"
+                        android:layout_height="44dp"
+                        android:contentDescription="ZIGBEE"
+                        android:backgroundTint="#80FFFFFF"
+                        android:alpha="0.7"
+                        android:backgroundTintMode="src_over"
+                        android:src="@drawable/wireless" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="70dp"
+                        android:gravity="center_vertical|left"
+                        android:layout_marginStart="18dp"
+                        android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/bt_rs485"
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    android:layout_marginTop="35dp"
-                    android:background="@drawable/button"
-                    android:gravity="center"
-                    android:text="@string/check"
-                    android:textColor="@color/Black" />
+                        <TextView
+                            android:id="@+id/tvzigbee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/zigbee"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvZIGstt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/No_connection"
+                            android:textColor="@color/Silver"
+                            android:textSize="12sp" />
 
+                    </LinearLayout>
 
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/bt_zig"
+                        android:layout_width="70dp"
+                        android:layout_height="37dp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="36dp"
+                        android:background="@drawable/button"
+                        android:text="@string/check"
+                        android:textColor="@color/Black" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+                <LinearLayout
+                    android:id="@+id/layoutLAN"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="85dp"
+                        android:layout_height="50dp"
+                        android:contentDescription="LAN"
+                        android:src="@drawable/rj45" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|left"
+                        android:layout_marginStart="13dp"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvlan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:text="@string/lan"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvLANstt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/No_connection"
+                            android:textColor="@color/Silver"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/bt_lan"
+                        android:layout_width="70dp"
+                        android:layout_height="37dp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="30dp"
+                        android:background="@drawable/button"
+                        android:text="@string/check"
+                        android:textColor="@color/Black" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+                <LinearLayout
+                    android:id="@+id/layoutRS485"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/imageView4"
+                        android:layout_width="80dp"
+                        android:layout_height="45dp"
+                        android:contentDescription="RS485"
+                        android:layout_marginStart="3dp"
+                        android:gravity="left"
+                        android:src="@drawable/rs485" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|left"
+                        android:layout_marginStart="15dp"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvrs485"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rs485"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvRSstt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/No_connection"
+                            android:textColor="@color/Silver"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                    <Button
+                        android:id="@+id/bt_rs485"
+                        android:layout_width="70dp"
+                        android:layout_height="37dp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="12dp"
+                        android:background="@drawable/button"
+                        android:text="@string/check"
+                        android:textColor="@color/Black" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

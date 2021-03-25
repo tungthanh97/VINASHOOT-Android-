@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.Charset;
 
 import com.example.vns_handheld004.Model.Shoot_result;
+import com.example.vns_handheld004.R;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 import java.io.UnsupportedEncodingException;
@@ -43,7 +44,7 @@ import java.util.Arrays;
 
 public class USBConnectionServices extends Service implements UsbSerialInterface.UsbReadCallback {
     //Declaration
-    public  String ID_Phone = "YA001";//5 byte
+    public  String ID_Phone ;//5 byte
     public static final String ID_PC = "YA000";//5 byte
     public static final String SEND_START = "@@";
     public static final String RECEIVE_START = "&&";
@@ -65,6 +66,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
     public void onCreate() {
         Log.e("Service", "onCreate");
         super.onCreate();
+        ID_Phone = getString(R.string.ID_PHONE);
         usbManager = (UsbManager) getSystemService(this.USB_SERVICE);
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
@@ -75,6 +77,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         sb.append((char)13);
         sb.append((char)10);
         MSG_STOP=sb.toString();
+
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -186,7 +189,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             @Override
             public void run() {
                 Context context = getApplicationContext();
-                Toast toast = Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(context, "Device disconnected", Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
@@ -209,7 +212,7 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
                 device = entry.getValue();
                 int deviceVID = device.getVendorId();
-                if (deviceVID == 0x2341 || deviceVID == 1659)//Arduino Vendor ID
+                if (deviceVID == 0x2341 || deviceVID == 1659|| deviceVID == 6790)//Arduino Vendor ID
                 {
                     PendingIntent pi = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
                     usbManager.requestPermission(device, pi);
@@ -239,9 +242,8 @@ public class USBConnectionServices extends Service implements UsbSerialInterface
         if (serialPort == null) return false;
         return serialPort.isOpen();
     }    //check USB connection Status
-    public boolean getArduinoStatus(){
-        return is_connected;
-    }
+
+
     public class CallService extends Binder {
         public USBConnectionServices getService() {
             return USBConnectionServices.this;

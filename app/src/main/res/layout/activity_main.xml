@@ -332,7 +332,7 @@
             android:layout_gravity="center_vertical|start"
             android:layout_weight="1"
             android:background="@drawable/id_selector"
-            android:text="YA001"
+            android:text="@string/ID_PHONE"
             android:textColor="@color/Black"
             android:textSize="17sp" />
 

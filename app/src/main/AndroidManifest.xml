@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.vns_handheld004">
+    <!--//Bluetooth Connection-->
+    <uses-feature android:name="android:hardware.bluetooth"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
     <!--//Adding Read External Storage Permission-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -18,28 +25,7 @@
         android:supportsRtl="true"
         android:background="#ffffff"
         android:theme="@style/Theme.AppCompat.Light">
-        <receiver
-            android:name="com.example.vns_handheld004.Broadcast.BootDeviceReceiver"
-            android:label="StartMyServiceAtBootReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:directBootAware="true">
-            <intent-filter android:priority="999">
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
-                <action android:name="android.intent.action.REBOOT"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.HOME" />
-            </intent-filter>
-        </receiver>
-        <activity
-            android:name="com.example.vns_handheld004.SettingActivity"
-            android:screenOrientation="portrait"
-            android:background="#ffffff"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        </activity>
+
         <activity
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:name="com.example.vns_handheld004.MainActivity"
@@ -49,45 +35,26 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             tools:targetApi="n">
-
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
-
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
-            <meta-data android:name="android.intent.action.BOOT_COMPLETED"
-                android:resource="@xml/device_filter" />
-
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
+        </activity>
+        <activity
+            android:name="com.example.vns_handheld004.SettingActivity"
+            android:screenOrientation="portrait"
+            android:background="#ffffff"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
         <service
-            android:name="com.example.vns_handheld004.Services.USBConnectionServices"
-            android:directBootAware="true"
-            tools:targetApi="n">
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
-            <meta-data android:name="android.intent.action.BOOT_COMPLETED"
-                android:resource="@xml/device_filter" />
-            <intent-filter>
-                <action android:name=".USBConnectionServices"/>
-            </intent-filter>
-        </service>
+            android:name="com.example.vns_handheld004.Services.BluetoothServices"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
