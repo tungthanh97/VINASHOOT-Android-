@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -30,11 +31,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     // Declare
     ArduinoMessageReceiver arduinoMessageReceiver;
     private static final String STATE = "Main Activity";
-    private boolean idUSBConnectionService = false, isRestart = false;
+    private boolean idUSBConnectionService = false, isRestart = false, is_Landscape = true;
     private Intent intent;
     private String ID;
     private BluetoothServices bluetoothServices;
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     private Target_Frame target_frame = new Target_Frame(this);
     private TargetAdapter targetAdapter ;
     private LinearLayoutManager TargetlayoutManager;
-    private ConstraintLayout layoutMain;
+    private LinearLayout layoutMain;
     int scrollX = 0;
     Paint borderPaint = new Paint();
     private List<Bitmap> BitmapList_show = new ArrayList<>(),BitmapList_origin= new ArrayList<>();
@@ -116,14 +119,17 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         {
             Toast.makeText(this,"Please shut down previous running app",Toast.LENGTH_SHORT).show();
         }
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         initArduinoMessagereceiver();
         checkBTPermission();
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            is_Landscape = true;
         }
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            is_Landscape = false;
         }
         super.onConfigurationChanged(newConfig);
         setContentView(R.layout.activity_main);
@@ -164,6 +170,10 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
     //<--Initialize View-->
     protected void initView() {
         layoutMain = findViewById(R.id.layoutMain);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        //getSupportActionBar().hide();
         layoutMain.setBackgroundColor(getResources().getColor(R.color.White));
         btnSetting = findViewById(R.id.btnSetting);
         btnGridsize = findViewById(R.id.btnGridsize);
@@ -178,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         tvid = findViewById(R.id.app_id);
         rvShootresult = findViewById(R.id.rvShootresults);
         headerScroll = findViewById(R.id.headerScroll);
-        nsvTable = findViewById(R.id.NSVtable);
-
+        nsvTable = findViewById(R.id.nsvTableResult);
         initTargetList();
         setOnListener();
         initTable();
         init_Paints();
+        fakedata();
     }
     //init ID storage
     private void initPreferences() {
@@ -314,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         rvShootresult.setHasFixedSize(false);
         rvShootresult.setLayoutManager(manager);
 //        ViewCompat.setNestedScrollingEnabled(rvShootresult, false);
-        //fakedata();
         rvShootresult.addItemDecoration(new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL));
     }
     protected void init_Paints(){
@@ -422,7 +431,8 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         Target_select = Target_count;
         Target_previous = Target_select;
         open_image(value);
-        tvTargetName.setText(value);
+        String targetName = is_Landscape?"Target "+value : value;
+        tvTargetName.setText(targetName);
         if (value.equals("A11")) tvTargetName.setText("AARM-11");
         if (value.equals("A12")) tvTargetName.setText("AARM-12");
         mImageBorder.setGridsize(gridsize);
@@ -541,6 +551,7 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         tvFrameNo.setText(lane);
         mImageBorder.openImageBitmap(BitmapList_origin.get(position),Target_select);    //update target image
         updateResultTable();
+        targetName = is_Landscape? "Target " + targetName : targetName;
         tvTargetName.setText( targetName );   //update target name
         if (targetName .equals("A11")) tvTargetName.setText("AARM-11");
         if (targetName .equals("A12")) tvTargetName.setText("AARM-12");
@@ -574,12 +585,14 @@ public class MainActivity extends AppCompatActivity implements MyBroadcastListen
         return outputimage;
     }
     private void fakedata(){
+        showTarget("7","00","1");
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
+        //showTarget("18","00","1");
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));
         shootList.add(new Shoot_result("1", "2", "3", "4", "5", "6"));

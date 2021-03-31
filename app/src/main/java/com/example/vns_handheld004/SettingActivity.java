@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,9 +18,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.vns_handheld004.Services.BluetoothServices;
@@ -47,7 +50,7 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
     private TextView tvid,tvBluetooth,tvZIG,tvLAN,tvRS485;
     private CardView cvBluetooth;
     private static String Bluetooth_connected_device ="";
-    ConstraintLayout layoutSetting;
+    LinearLayout layoutSetting;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     //region Initialize------------------------
@@ -60,8 +63,18 @@ public class SettingActivity extends AppCompatActivity implements MyBroadcastLis
         initPreferences();
         checkBluetoth();
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        }
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        }
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.activity_setting_activities);
+    }
     protected void initView(){
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         layoutSetting = findViewById(R.id.layoutSetting);
         layoutSetting.setBackgroundColor(getResources().getColor(R.color.White));
         swUSB= findViewById(R.id.sw_usb);

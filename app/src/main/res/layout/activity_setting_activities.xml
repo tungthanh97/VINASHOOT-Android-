@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layoutSetting"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.vns_handheld004.SettingActivity">
+    tools:context="com.example.vns_handheld004.SettingActivity"
+    android:orientation="vertical"
+    android:gravity="center">
     <LinearLayout
         android:id="@+id/layoutlogo"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="4dp"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toTopOf="@+id/settings"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3">
+        android:layout_marginEnd="10dp"
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/logo"
             android:layout_width="36dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="@drawable/border"
@@ -37,7 +35,7 @@
             android:layout_width="240dp"
             android:layout_height="26dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="2dp"
             android:layout_weight="9"
             android:background="@drawable/border"
@@ -52,6 +50,7 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="65dp"
             android:layout_height="24dp"
+            android:layout_marginTop="2dp"
             android:layout_gravity="center_vertical|start"
             android:layout_weight="1"
             android:background="@drawable/id_selector"
@@ -66,125 +65,129 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp"
         android:text="@string/setting"
-        android:textSize="18sp"
         android:textColor="@color/FbBlue"
-        app:layout_constraintBottom_toTopOf="@+id/layoutButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutlogo" />
-        <LinearLayout
+        android:textSize="18sp" />
+
+    <LinearLayout
             android:id="@+id/layoutButtons"
-            android:layout_width="365dp"
-            android:layout_height="329dp"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
             android:layout_centerInParent="true"
             android:layout_centerHorizontal="true"
             android:orientation="vertical"
-            android:layout_marginTop="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintVertical_bias="0.2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings">
+            android:layout_margin="10dp">
             <androidx.cardview.widget.CardView
                 android:id = "@+id/cvBluetooth"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="5dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
                 <LinearLayout
                     android:id="@+id/layoutBluetooth"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:orientation="horizontal">
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:weightSum="15"
+                    >
                     <ImageView
                         android:layout_width="56dp"
-                        android:layout_height="61dp"
+                        android:layout_height="50dp"
                         android:contentDescription="USB"
                         android:layout_marginStart="15dp"
                         android:src="@drawable/usb" />
+
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginStart="30dp"
+                        android:layout_weight="14"
                         android:gravity="center_vertical|left"
-                        android:layout_marginStart="27dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:weightSum="20">
 
                         <TextView
                             android:id="@+id/tvBluetooth"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_weight="9"
                             android:text="@string/bluetooth"
-                            android:textSize="18sp" />
+                            android:textSize="22sp" />
+
                         <TextView
                             android:id="@+id/tvBluetoothSTT"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_weight="9"
                             android:text="@string/bluetoothStatus"
                             android:textColor="@color/Silver"
-                            android:textSize="12sp" />
+                            android:textSize="16sp" />
 
                     </LinearLayout>
+
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sw_usb"
+                        android:layout_weight="1"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginStart="50dp"
-                        android:layout_marginEnd="13dp"
-                        android:gravity="center_horizontal|center_vertical"
+                        android:layout_height="50dp"
+                        android:paddingEnd="20dp"
+                        android:gravity="center"
                         android:theme="@style/SCBSwitch" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="5dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
                 <LinearLayout
                     android:id="@+id/layoutZIG"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_height="50dp"
+                    android:weightSum="10"
+                    android:orientation="horizontal"
+                    android:gravity ="center">
                     <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="80dp"
-                        android:layout_height="44dp"
-                        android:contentDescription="ZIGBEE"
-                        android:backgroundTint="#80FFFFFF"
-                        android:alpha="0.7"
-                        android:backgroundTintMode="src_over"
+                        android:layout_width="65dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="LAN"
                         android:src="@drawable/wireless" />
+
+
                     <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="70dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="30dp"
+                        android:layout_weight="10"
                         android:gravity="center_vertical|left"
-                        android:layout_marginStart="18dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:weightSum="18">
 
                         <TextView
                             android:id="@+id/tvzigbee"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
                             android:layout_marginTop="2dp"
+                            android:layout_weight="11"
                             android:text="@string/zigbee"
-                            android:textSize="18sp" />
+                            android:textSize="22sp" />
+
                         <TextView
                             android:id="@+id/tvZIGstt"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
+                            android:layout_weight="7"
                             android:text="@string/No_connection"
                             android:textColor="@color/Silver"
-                            android:textSize="12sp" />
+                            android:textSize="16sp" />
 
                     </LinearLayout>
 
@@ -192,123 +195,142 @@
                         android:id="@+id/bt_zig"
                         android:layout_width="70dp"
                         android:layout_height="37dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_weight="3"
                         android:gravity="center_horizontal|center_vertical"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginStart="36dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="20dp"
                         android:background="@drawable/button"
                         android:text="@string/check"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/Black"/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="5dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
                 <LinearLayout
                     android:id="@+id/layoutLAN"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    android:gravity ="center">
                     <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="85dp"
-                        android:layout_height="50dp"
+                        android:layout_width="56dp"
+                        android:layout_height="55dp"
+                        android:layout_marginStart="15dp"
                         android:contentDescription="LAN"
                         android:src="@drawable/rj45" />
+
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginStart="30dp"
+                        android:layout_weight="10"
                         android:gravity="center_vertical|left"
-                        android:layout_marginStart="13dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:weightSum="18">
+
                         <TextView
                             android:id="@+id/tvlan"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="2dp"
+                            android:layout_weight="11"
                             android:text="@string/lan"
-                            android:textSize="18sp" />
+                            android:textSize="22sp" />
+
                         <TextView
                             android:id="@+id/tvLANstt"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
+                            android:layout_weight="7"
                             android:text="@string/No_connection"
                             android:textColor="@color/Silver"
-                            android:textSize="12sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <Button
                         android:id="@+id/bt_lan"
                         android:layout_width="70dp"
                         android:layout_height="37dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_weight="3"
                         android:gravity="center_horizontal|center_vertical"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="20dp"
                         android:background="@drawable/button"
                         android:text="@string/check"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/Black"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="5dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
                 <LinearLayout
                     android:id="@+id/layoutRS485"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    android:gravity ="center"
+                    >
                     <ImageView
                         android:id="@+id/imageView4"
-                        android:layout_width="80dp"
-                        android:layout_height="45dp"
-                        android:contentDescription="RS485"
-                        android:layout_marginStart="3dp"
-                        android:gravity="left"
-                        android:src="@drawable/rs485" />
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical|left"
+                        android:layout_width="56dp"
+                        android:layout_height="55dp"
+                        android:contentDescription="USB"
                         android:layout_marginStart="15dp"
-                        android:orientation="vertical">
+                        android:src="@drawable/rs485" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="30dp"
+                        android:layout_weight="10"
+                        android:gravity="center_vertical|left"
+                        android:orientation="horizontal"
+                        android:weightSum="18">
+
                         <TextView
                             android:id="@+id/tvrs485"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="2dp"
+                            android:layout_weight="11"
                             android:text="@string/rs485"
-                            android:textSize="18sp" />
+                            android:textSize="22sp" />
+
                         <TextView
                             android:id="@+id/tvRSstt"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
+                            android:layout_weight="7"
                             android:text="@string/No_connection"
                             android:textColor="@color/Silver"
-                            android:textSize="12sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
                     <Button
                         android:id="@+id/bt_rs485"
                         android:layout_width="70dp"
                         android:layout_height="37dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_weight="3"
                         android:gravity="center_horizontal|center_vertical"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="20dp"
                         android:background="@drawable/button"
                         android:text="@string/check"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/Black"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
